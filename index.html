@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Formation des délégués de classe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F7F9FF; --sheet:#FFFFFF; --line:#E6ECF9; --line-strong:#CBD7F1; --margin:#E2483D;
+  --ink:#1B2A6B; --ink-soft:#4C5A8F; --muted:#6F7BA8; --card:#FFFFFF; --edge:#D3DCF2;
+  --ok:#14804A; --ok-bg:#E1F4E8; --bad:#C3342A; --bad-bg:#FCE5E2; --mid:#B5700A; --mid-bg:#FFF0D2;
+  --yellow:#FFE45C; --pink:#FF9DCA; --green:#8BE6B0; --blue:#94CEFF; --chip-ink:#17224F;
+  --btn:#1B2A6B; --btn-ink:#FFFFFF; --shadow:0 2px 0 rgba(27,42,107,.12);
+  --f-body:"Atkinson Hyperlegible","Segoe UI",Arial,sans-serif;
+  --f-disp:"Bricolage Grotesque","Arial Black","Segoe UI",sans-serif;
+  --f-hand:"Caveat","Segoe Print","Comic Sans MS",cursive;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#16211D; --sheet:#1C2924; --line:rgba(255,255,255,.04); --line-strong:rgba(255,255,255,.08); --margin:#F07A6E;
+    --ink:#F1EFE4; --ink-soft:#C9CDBF; --muted:#9AA394; --card:#24332D; --edge:#36483F;
+    --ok:#6FD99C; --ok-bg:#1E3D2C; --bad:#FF8A7E; --bad-bg:#45231F; --mid:#F5BC5A; --mid-bg:#43351A;
+    --btn:#F1EFE4; --btn-ink:#16211D; --shadow:0 2px 0 rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#16211D; --sheet:#1C2924; --line:rgba(255,255,255,.04); --line-strong:rgba(255,255,255,.08); --margin:#F07A6E;
+  --ink:#F1EFE4; --ink-soft:#C9CDBF; --muted:#9AA394; --card:#24332D; --edge:#36483F;
+  --ok:#6FD99C; --ok-bg:#1E3D2C; --bad:#FF8A7E; --bad-bg:#45231F; --mid:#F5BC5A; --mid-bg:#43351A;
+  --btn:#F1EFE4; --btn-ink:#16211D; --shadow:0 2px 0 rgba(0,0,0,.35);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{font-size:clamp(15px, .55vw + 10px, 23px); height:100%; scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0; height:100%; display:grid; grid-template-rows:auto 1fr auto; font-family:var(--f-body); color:var(--ink); background:var(--paper)}
+button,input{font:inherit; color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--margin); outline-offset:2px}
+
+/* Barre du haut */
+#top{display:flex; align-items:center; gap:1rem; padding:.5rem 1rem; background:var(--sheet); border-bottom:2px solid var(--line-strong); flex-wrap:wrap}
+.brand{font-family:var(--f-disp); font-weight:800; font-size:1.05rem; line-height:1.1}
+.brand small{display:block; font-family:var(--f-body); font-weight:400; font-size:.75rem; color:var(--muted)}
+.lvl{font-family:var(--f-hand); font-size:1.4rem; color:var(--margin); margin-left:.25rem}
+#scores{margin-left:auto; display:flex; gap:.5rem; flex-wrap:wrap}
+.team{display:flex; align-items:center; gap:.35rem; padding:.25rem .35rem .25rem .7rem; border-radius:999px; color:var(--chip-ink); font-weight:700; transition:transform .2s}
+.team .ts{font-family:var(--f-disp); font-size:1.35rem; min-width:1.6ch; text-align:center}
+.team button{width:1.7rem; height:1.7rem; border-radius:50%; border:0; background:rgba(255,255,255,.65); color:var(--chip-ink); font-weight:700; line-height:1}
+.team.flash{transform:scale(1.15)}
+.c-yellow{background:var(--yellow)} .c-pink{background:var(--pink)} .c-green{background:var(--green)} .c-blue{background:var(--blue)}
+
+/* Feuille Séyès */
+#stage{overflow:auto; background:
+  linear-gradient(var(--line-strong) 1.5px, transparent 1.5px) 0 0/100% 2rem,
+  linear-gradient(var(--line) 1px, transparent 1px) 0 0/100% .5rem,
+  linear-gradient(90deg, var(--line-strong) 1px, transparent 1px) 0 0/2rem 100%, var(--paper)}
+.sheet{position:relative; max-width:1320px; margin:0 auto; min-height:100%; padding:1.5rem 1.5rem 2.5rem 5.5rem}
+.sheet::before{content:""; position:absolute; left:4.25rem; top:0; bottom:0; width:2px; background:var(--margin)}
+.mnum{position:absolute; left:.6rem; top:1rem; width:3.2rem; text-align:center; font-family:var(--f-hand); font-weight:700; font-size:3rem; color:var(--margin); line-height:1}
+.bh{display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; flex-wrap:wrap; margin-bottom:1.25rem}
+.bh h1{font-family:var(--f-disp); font-weight:800; font-size:2.4rem; line-height:1.05; margin:0 0 .3rem}
+.bh .lead{margin:0; font-size:1.05rem; color:var(--ink-soft); max-width:60ch}
+.meta{display:flex; flex-direction:column; align-items:flex-end; gap:.3rem; font-size:.85rem; color:var(--muted)}
+.liv{background:var(--card); border:1px solid var(--edge); border-radius:6px; padding:.2rem .5rem}
+
+/* Éléments communs */
+.btn{border:0; border-radius:10px; padding:.6rem 1.1rem; background:var(--btn); color:var(--btn-ink); font-weight:700; box-shadow:var(--shadow)}
+.btn:disabled{opacity:.4; cursor:not-allowed}
+.btn.ghost{background:var(--card); color:var(--ink); border:2px solid var(--edge)}
+.btn.big{font-size:1.2rem; padding:.85rem 1.5rem}
+.row{display:flex; gap:.75rem; align-items:center; flex-wrap:wrap}
+.row.end{justify-content:flex-end}
+.row.center{justify-content:center}
+.card{background:var(--card); border:2px solid var(--edge); border-radius:14px; padding:1.1rem 1.3rem}
+.hand{font-family:var(--f-hand); font-weight:700; font-size:1.7rem; line-height:1.15; color:var(--ok)}
+.hand.bad{color:var(--bad)} .hand.mid{color:var(--mid)} .hand.ink{color:var(--ink)}
+.counter{font-size:.9rem; color:var(--muted)}
+.big-text{font-family:var(--f-disp); font-weight:600; font-size:2rem; line-height:1.2}
+.award{display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; margin-top:1rem; font-size:.9rem; color:var(--muted)}
+.chip-btn{border:0; border-radius:999px; padding:.35rem .9rem; font-weight:700; color:var(--chip-ink)}
+.chip-btn.given{opacity:.35; text-decoration:line-through}
+.spacer{height:1rem}
+.grid2{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,20rem),1fr)); gap:1rem}
+
+/* Bas de page */
+#bottom{display:flex; align-items:center; gap:.75rem; padding:.5rem 1rem; background:var(--sheet); border-top:2px solid var(--line-strong)}
+#bottom .mid{flex:1; display:flex; justify-content:center; gap:1rem; align-items:center; flex-wrap:wrap}
+#stepBtn{background:none; border:2px dashed var(--edge); border-radius:10px; padding:.4rem .9rem}
+#timer{display:flex; align-items:center; gap:.3rem; padding:.2rem .4rem .2rem .8rem; border-radius:10px; background:var(--card); border:2px solid var(--edge)}
+#tmTime{font-family:var(--f-disp); font-weight:800; font-size:1.5rem; min-width:4ch; text-align:center; font-variant-numeric:tabular-nums}
+#timer button{border:0; background:none; font-size:1.1rem; width:2rem; height:2rem; border-radius:8px}
+#timer button:hover{background:var(--paper)}
+#timer.ending{border-color:var(--mid); color:var(--mid)}
+#timer.over{border-color:var(--bad); background:var(--bad-bg); color:var(--bad); animation:pulse 1s 3}
+@keyframes pulse{50%{transform:scale(1.08)}}
+
+/* Sommaire */
+#drawer{position:fixed; inset:0; background:rgba(10,15,40,.45); display:flex; justify-content:flex-start; z-index:10}
+#drawer[hidden]{display:none}
+#drawer .panel{background:var(--sheet); width:min(26rem,92vw); height:100%; overflow:auto; padding:calc(1rem + env(safe-area-inset-top,0px)) 1rem calc(1rem + env(safe-area-inset-bottom,0px))}
+#drawer h2{font-family:var(--f-disp); margin:.2rem 0 .8rem}
+#drawer ol{list-style:none; padding:0; margin:0}
+#drawer li button{width:100%; display:flex; gap:.6rem; align-items:baseline; text-align:left; background:none; border:0; border-bottom:1px solid var(--line-strong); padding:.55rem .3rem}
+#drawer li button .n{font-family:var(--f-hand); font-size:1.5rem; color:var(--margin); width:1.8rem}
+#drawer li button .d{margin-left:auto; color:var(--muted); font-size:.85rem}
+#drawer li.cur button{background:var(--paper); font-weight:700}
+
+.copy{font-size:.8rem; color:var(--muted); margin-top:1rem}
+/* Accueil */
+.home{max-width:1100px; margin:0 auto; padding:2.5rem 1.5rem}
+.home h1{font-family:var(--f-disp); font-weight:800; font-size:clamp(2.6rem,6vw,5rem); line-height:.95; margin:0}
+.home .sub{font-family:var(--f-hand); font-size:2rem; color:var(--margin); margin:.4rem 0 2rem}
+.lvl-pick{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr)); gap:1rem; margin:1rem 0 2rem}
+.lvl-pick button{border:3px solid var(--edge); background:var(--card); border-radius:16px; padding:1.2rem; text-align:left}
+.lvl-pick button b{display:block; font-family:var(--f-disp); font-size:2.6rem}
+.lvl-pick button.on{border-color:var(--ink); box-shadow:inset 0 0 0 2px var(--ink)}
+.teams-edit{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,13rem),1fr)); gap:.75rem; margin:.75rem 0 2rem}
+.teams-edit label{display:flex; align-items:center; gap:.5rem; border-radius:12px; padding:.4rem .6rem; color:var(--chip-ink); font-weight:700}
+.teams-edit input{flex:1; min-width:0; border:0; border-radius:8px; padding:.4rem .5rem; background:rgba(255,255,255,.8); color:var(--chip-ink)}
+.howto{color:var(--ink-soft); max-width:65ch}
+
+/* Cadre */
+.rules{list-style:none; padding:0; margin:0 0 1.5rem; display:grid; gap:.8rem}
+.rules li{display:flex; gap:1rem; align-items:center; font-family:var(--f-disp); font-weight:600; font-size:1.7rem}
+.rules li span{font-family:var(--f-hand); color:var(--ok); font-size:2.4rem}
+.menu-list{columns:2 16rem; padding-left:1.4rem; margin:.5rem 0 0}
+.menu-list li{margin:.2rem 0; break-inside:avoid}
+
+/* Nuage */
+.cloud-form{display:flex; gap:.6rem; margin-bottom:1rem; flex-wrap:wrap}
+.cloud-form input{flex:1; min-width:12rem; font-size:1.3rem; padding:.6rem .9rem; border:2px solid var(--edge); border-radius:10px; background:var(--card)}
+.cloud{min-height:16rem; display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:.4rem 1.2rem; padding:1.5rem; background:var(--card); border:2px solid var(--edge); border-radius:16px}
+.cloud .w{position:relative; font-family:var(--f-disp); font-weight:800; line-height:1; background:none; border:0; padding:.1rem .2rem; transition:font-size .25s}
+.cloud .w .x{position:absolute; top:-.6rem; right:-.8rem; font-size:.8rem; width:1.3rem; height:1.3rem; border-radius:50%; background:var(--bad); color:#fff; display:none; align-items:center; justify-content:center; font-family:var(--f-body)}
+.cloud .w:hover .x{display:flex}
+.cloud-empty{color:var(--muted); font-family:var(--f-hand); font-size:1.8rem}
+.quote{font-family:var(--f-hand); font-size:2.1rem; color:var(--ink); text-align:center; margin:1.5rem auto 0; max-width:40ch}
+
+/* Tri */
+.tri-card{max-width:46rem; margin:0 auto 1.25rem; text-align:center; padding:2rem 1.5rem; background:var(--card); border:3px solid var(--ink); border-radius:18px; box-shadow:6px 6px 0 var(--line-strong)}
+.cols{display:grid; grid-template-columns:repeat(3,1fr); gap:.8rem}
+.col{border:3px dashed var(--edge); border-radius:14px; padding:.8rem; min-height:7rem; background:var(--card); display:flex; flex-direction:column; gap:.4rem}
+.col h3{margin:0; font-family:var(--f-disp); font-size:1.3rem; display:flex; justify-content:space-between}
+.col.ok{border-color:var(--ok)} .col.no{border-color:var(--bad)} .col.talk{border-color:var(--mid)}
+button.col{text-align:left}
+button.col:hover:not(:disabled){background:var(--paper)}
+.col .mini{font-size:.8rem; padding:.25rem .45rem; border-radius:6px; background:var(--paper)}
+.col .mini.wrong{background:var(--bad-bg)}
+.fb{margin-top:1rem; padding:1rem 1.2rem; border-radius:12px; background:var(--card); border-left:6px solid var(--ok)}
+.fb.bad{border-left-color:var(--bad)} .fb.mid{border-left-color:var(--mid)}
+.fb p{margin:.3rem 0 0; font-size:1.1rem}
+
+/* Débat */
+.deb{display:grid; grid-template-columns:1fr 2.2fr 1fr; gap:1rem; align-items:stretch}
+.zone{border-radius:16px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.5rem; padding:1rem; font-family:var(--f-disp); font-weight:800; font-size:1.5rem; text-align:center}
+.zone.no{background:var(--bad-bg); color:var(--bad)} .zone.yes{background:var(--ok-bg); color:var(--ok)}
+.zone .cnt{display:flex; align-items:center; gap:.4rem; font-size:2rem}
+.zone .cnt button{width:2rem; height:2rem; border-radius:50%; border:0; background:var(--card); color:inherit; font-weight:800}
+.deb-st{background:var(--card); border:3px solid var(--ink); border-radius:18px; padding:1.5rem; display:flex; flex-direction:column; justify-content:center; text-align:center; min-height:14rem}
+details.rules-box{margin-top:1rem; background:var(--card); border:2px solid var(--edge); border-radius:12px; padding:.6rem 1rem}
+details.rules-box summary{font-weight:700; cursor:pointer}
+details.rules-box ul{margin:.5rem 0 0}
+
+/* Casquettes */
+.caps{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,15rem),1fr)); gap:1.4rem; margin-top:.5rem}
+.cap{position:relative; border:0; text-align:left; padding:1.6rem 1.2rem 1.2rem; min-height:14rem; border-radius:4px; color:var(--chip-ink); box-shadow:3px 4px 0 rgba(0,0,0,.12); display:flex; flex-direction:column; gap:.6rem}
+.cap:nth-child(odd){transform:rotate(-1.2deg)} .cap:nth-child(even){transform:rotate(1deg)}
+.cap::before{content:""; position:absolute; top:-.7rem; left:50%; width:5rem; height:1.4rem; transform:translateX(-50%) rotate(-3deg); background:rgba(255,255,255,.55); border:1px solid rgba(0,0,0,.06)}
+.cap .em{font-size:2.4rem}
+.cap .def{font-size:1.1rem}
+.cap .nm{margin-top:auto; font-family:var(--f-hand); font-size:2.3rem; font-weight:700}
+.cap .nm.hid{color:rgba(23,34,79,.35)}
+
+/* Choix (qui, instance, quiz, dis) */
+.situ{font-family:var(--f-disp); font-weight:600; font-size:1.9rem; line-height:1.2; background:var(--card); border:3px solid var(--ink); border-radius:18px; padding:1.4rem 1.6rem; margin-bottom:1.2rem}
+.opts{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,13rem),1fr)); gap:.7rem}
+.opt{border:2px solid var(--edge); background:var(--card); border-radius:12px; padding:.8rem 1rem; text-align:left; font-size:1.05rem; display:flex; gap:.6rem; align-items:center; min-height:3.4rem}
+.opt:hover:not(:disabled){border-color:var(--ink)}
+.opt .em{font-size:1.6rem}
+.opt.right{background:var(--ok-bg); border-color:var(--ok); color:var(--ok); font-weight:700}
+.opt.wrong{background:var(--bad-bg); border-color:var(--bad); color:var(--bad); text-decoration:line-through}
+.opt:disabled{cursor:default}
+.opt .lt{font-family:var(--f-disp); font-weight:800; font-size:1.3rem; width:2rem; height:2rem; display:inline-flex; align-items:center; justify-content:center; border-radius:8px; background:var(--paper); flex:none}
+.opts.long{grid-template-columns:1fr}
+.opts.long .opt{font-size:1.25rem}
+.opt-fb{display:block; font-family:var(--f-hand); font-size:1.45rem; margin-top:.25rem; text-decoration:none}
+
+/* Instance */
+.clues{list-style:none; padding:0; margin:0 0 1rem; display:grid; gap:.5rem}
+.clues li{display:flex; gap:.8rem; align-items:center; background:var(--card); border:2px solid var(--edge); border-radius:12px; padding:.7rem 1rem; font-size:1.35rem}
+.clues li .n{font-family:var(--f-hand); font-size:2rem; color:var(--margin); width:1.5rem}
+.clues li.hidden{color:var(--muted); border-style:dashed; font-style:italic; font-size:1rem}
+.pts{font-family:var(--f-disp); font-weight:800; font-size:1.3rem}
+.fiche{display:grid; grid-template-columns:auto 1fr; gap:.3rem 1rem; margin-top:.6rem; font-size:1.05rem}
+.fiche b{color:var(--margin)}
+
+/* Conseil */
+.tabs{display:flex; gap:.4rem; margin-bottom:1rem; flex-wrap:wrap}
+.tabs button{border:2px solid var(--edge); background:var(--card); border-radius:10px 10px 0 0; padding:.5rem 1rem; font-weight:700}
+.tabs button.on{background:var(--ink); color:var(--btn-ink); border-color:var(--ink)}
+:root[data-theme="dark"] .tabs button.on{color:var(--paper)}
+.table-wrap{display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,1fr); gap:1.5rem; align-items:center}
+.rtable{position:relative; width:100%; max-width:34rem; aspect-ratio:1; margin:0 auto}
+.rtable .tbl{position:absolute; inset:24%; border-radius:50%; background:var(--card); border:3px solid var(--ink); display:flex; align-items:center; justify-content:center; text-align:center; font-family:var(--f-hand); font-size:1.6rem; padding:1rem}
+.seat{position:absolute; transform:translate(-50%,-50%); border:2px solid var(--edge); background:var(--card); border-radius:999px; padding:.35rem .7rem; font-size:.85rem; font-weight:700; white-space:nowrap}
+.seat.me{background:var(--yellow); color:var(--chip-ink); border-color:var(--chip-ink)}
+.seat.on{outline:3px solid var(--margin)}
+.list-big{font-size:1.2rem; padding-left:1.3rem} .list-big li{margin:.45rem 0}
+.sticky{background:var(--yellow); color:var(--chip-ink); padding:1rem 1.2rem; border-radius:4px; transform:rotate(-1deg); box-shadow:3px 4px 0 rgba(0,0,0,.12)}
+.sticky h3{margin:0 0 .3rem; font-family:var(--f-hand); font-size:2rem}
+
+/* Ordre */
+.order{list-style:none; padding:0; margin:0; display:grid; gap:.45rem; max-width:52rem}
+.order li{display:flex; align-items:center; gap:.7rem; background:var(--card); border:2px solid var(--edge); border-radius:12px; padding:.55rem .7rem; font-size:1.2rem; cursor:grab; user-select:none}
+.order li.dragging{opacity:.4}
+.order li.over{border-color:var(--ink); border-style:dashed}
+.order li .pos{font-family:var(--f-hand); font-size:1.8rem; color:var(--margin); width:1.8rem; text-align:center}
+.order li .t{flex:1}
+.order li .arr{display:flex; flex-direction:column}
+.order li .arr button{border:0; background:var(--paper); border-radius:6px; width:2rem; height:1.4rem; font-size:.75rem; margin:1px 0}
+.order li.ex{border-color:var(--ok); background:var(--ok-bg)}
+.order li.ph{border-color:var(--mid); background:var(--mid-bg)}
+.order li.ko{border-color:var(--bad); background:var(--bad-bg)}
+.tag{font-size:.8rem; font-weight:700; padding:.15rem .5rem; border-radius:999px; background:var(--paper)}
+.legend{display:flex; gap:1rem; flex-wrap:wrap; font-size:.9rem; margin:.6rem 0}
+.legend span::before{content:""; display:inline-block; width:.9rem; height:.9rem; border-radius:3px; margin-right:.35rem; vertical-align:-2px}
+.legend .l1::before{background:var(--ok)} .legend .l2::before{background:var(--mid)} .legend .l3::before{background:var(--bad)}
+
+/* Notes */
+.appr{position:relative; background:var(--card); border:3px solid var(--ink); border-radius:16px; padding:1.2rem 1.4rem; margin-bottom:1rem; min-height:7rem}
+.appr .txt{font-size:1.45rem; line-height:1.4}
+.appr .veil{color:var(--muted); font-family:var(--f-hand); font-size:1.8rem}
+.cd{position:absolute; top:.6rem; right:.9rem; font-family:var(--f-disp); font-weight:800; font-size:1.6rem; color:var(--margin)}
+.ngrid{display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:.5rem}
+.ngrid h4{margin:0 0 .3rem; font-family:var(--f-disp); font-size:1rem; text-align:center}
+.ngrid .colx{display:flex; flex-direction:column; gap:.3rem}
+.nb{border:2px solid var(--edge); background:var(--card); border-radius:8px; padding:.35rem .4rem; font-size:.85rem; text-align:center; min-height:2.6rem}
+.nb.sel{background:var(--ink); color:var(--btn-ink); border-color:var(--ink)}
+.nb.right{background:var(--ok-bg); color:var(--ok); border-color:var(--ok); font-weight:700}
+.nb.wrong{background:var(--bad-bg); color:var(--bad); border-color:var(--bad); text-decoration:line-through}
+
+/* Lettres */
+.word{display:flex; gap:.4rem; justify-content:center; flex-wrap:wrap; margin:1rem 0}
+.word span{width:2.6rem; height:3.4rem; border-bottom:4px solid var(--ink); display:flex; align-items:flex-end; justify-content:center; font-family:var(--f-disp); font-weight:800; font-size:2.4rem}
+.word span.sp{border:0; width:1rem}
+.word span.fixed{border-bottom-color:transparent}
+.word span.miss{color:var(--bad)}
+.keys{display:flex; flex-wrap:wrap; gap:.35rem; justify-content:center; max-width:44rem; margin:0 auto}
+.keys button{width:2.6rem; height:2.6rem; border-radius:8px; border:2px solid var(--edge); background:var(--card); font-weight:700; font-size:1.1rem}
+.keys button.hit{background:var(--ok-bg); border-color:var(--ok); color:var(--ok)}
+.keys button.no{background:var(--bad-bg); border-color:var(--bad); color:var(--bad); opacity:.6}
+.pencils{text-align:center; font-size:1.6rem; letter-spacing:.2rem}
+.pencils .used{opacity:.15}
+
+/* Bilan */
+.podium{display:flex; align-items:flex-end; justify-content:center; gap:.8rem; height:16rem; margin:1rem 0 1.5rem}
+.pod{width:min(9rem,22%); border-radius:12px 12px 0 0; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding-top:.6rem; color:var(--chip-ink); font-weight:700; text-align:center}
+.pod .rk{font-family:var(--f-disp); font-weight:800; font-size:2rem}
+.pod .sc{font-family:var(--f-disp); font-size:1.3rem}
+.meteo{display:flex; gap:.6rem; flex-wrap:wrap; justify-content:center}
+.meteo button{border:2px solid var(--edge); background:var(--card); border-radius:14px; padding:.6rem .8rem; min-width:7rem; display:flex; flex-direction:column; align-items:center; gap:.1rem}
+.meteo .e{font-size:2.4rem} .meteo .c{font-family:var(--f-disp); font-weight:800; font-size:1.5rem}
+#diploma{margin-top:1.5rem; background:#fff; color:#1B2A6B; border:6px double #1B2A6B; border-radius:6px; padding:2rem; text-align:center; max-width:46rem; margin-left:auto; margin-right:auto}
+#diploma h2{font-family:var(--f-disp); font-weight:800; font-size:2.4rem; margin:.2rem 0}
+#diploma .h{font-family:"Caveat",cursive; font-size:1.8rem; color:#E2483D}
+#diploma .line{border-bottom:2px dotted #1B2A6B; width:70%; margin:1.6rem auto .3rem; height:1.5rem}
+#diploma .sig{display:flex; justify-content:space-between; margin-top:2rem; font-size:.9rem}
+
+@media (max-width:760px){
+  .sheet{padding-left:3.2rem} .sheet::before{left:2.4rem} .mnum{width:2.2rem; font-size:2rem; left:.1rem}
+  .cols{grid-template-columns:1fr} .deb{grid-template-columns:1fr} .table-wrap{grid-template-columns:1fr}
+  .ngrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .bh h1{font-size:1.8rem}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important; animation:none!important}}
+@media print{
+  body{display:block; background:#fff}
+  body *{visibility:hidden}
+  #diploma, #diploma *{visibility:visible}
+  #diploma{position:absolute; left:0; top:0; width:100%; max-width:none; margin:0}
+}
+</style>
+</head>
+<body>
+<header id="top">
+  <div class="brand">Formation des délégués<small>Collège Yves du Manoir, 2025-2026, M. Deston (CPE)</small></div>
+  <span class="lvl" id="lvlTag"></span>
+  <div id="scores"></div>
+</header>
+<main id="stage"></main>
+<footer id="bottom" hidden>
+  <button class="btn ghost" id="prevBtn">◀ Précédent</button>
+  <div class="mid">
+    <button id="stepBtn" title="Ouvrir le sommaire"></button>
+    <div id="timer" title="Chronomètre">
+      <span id="tmTime">00:00</span>
+      <button id="tmPlay" aria-label="Lancer ou mettre en pause">▶</button>
+      <button id="tmReset" aria-label="Remettre à zéro">↺</button>
+      <button id="tmPlus" aria-label="Ajouter une minute">+1</button>
+    </div>
+  </div>
+  <span class="copy" style="margin:0">© Eude Florian</span>
+  <button class="btn" id="nextBtn">Suivant ▶</button>
+</footer>
+<div id="drawer" hidden><div class="panel" id="drawerPanel"></div></div>
+
+<script>
+/* ============ DONNÉES ============ */
+const TRI = [
+  {t:"Transmettre à la classe ce qui s’est dit au conseil de classe", a:"ok", why:"C’est une de tes missions principales : tu rends compte à la classe."},
+  {t:"Se plaindre à la place des autres", a:"no", why:"Tu portes la parole collective de la classe, pas les plaintes de chacun. Chaque élève peut aussi parler pour lui-même."},
+  {t:"Soutenir un camarade en difficulté", a:"ok", why:"C’est ton rôle de médiateur : écouter, conseiller, orienter vers le bon adulte."},
+  {t:"Espionner les autres et tout raconter aux adultes", a:"no", why:"Le délégué n’est pas un espion. Il a la confiance de la classe, il ne doit pas la trahir."},
+  {t:"Prévenir un adulte en cas de harcèlement", a:"ok", why:"Oui ! Ce n’est pas trahir, c’est protéger. Tout élève devrait le faire. Numéro national : le 3018."},
+  {t:"Organiser une fête de classe", a:"talk", why:"Possible avec l’accord des adultes, mais ce n’est pas une obligation : ça peut être un projet de toute la classe."},
+  {t:"Donner son avis sur la vie du collège", a:"ok", why:"Au conseil de classe, à l’assemblée des délégués et au CVC (conseil de la vie collégienne)."},
+  {t:"Être le chef de la classe", a:"no", why:"Le délégué ne commande personne. Il représente, il écoute, il transmet."},
+  {t:"Accompagner un élève à l’infirmerie", a:"no", why:"N’importe quel élève désigné par le professeur peut le faire. Ce n’est pas réservé au délégué."},
+  {t:"Distribuer et ramasser les copies", a:"no", why:"Ce n’est pas une mission du délégué (livret : « Je ne suis pas le distributeur ou ramasseur de papier »)."},
+  {t:"Représenter toute la classe, même ceux avec qui je ne m’entends pas", a:"ok", why:"Tu as été élu pour représenter tout le monde, pas seulement tes amis."},
+  {t:"Défendre ses copains au conseil de classe", a:"no", why:"En conseil de classe, tu n’es pas l’avocat. Tu apportes des informations utiles et justes, pour tous."},
+  {t:"Faire remplir un questionnaire avant le conseil", a:"ok", why:"C’est un très bon moyen de consulter la classe (il est dans ton livret)."},
+  {t:"Être un exemple pour la classe", a:"talk", why:"On attend du délégué un comportement positif… mais c’est un élève comme les autres, il a le droit à l’erreur."},
+  {t:"Calmer une dispute entre deux élèves", a:"talk", why:"Le délégué peut jouer les médiateurs. Mais si c’est grave ou si ça dure, on prévient un adulte."},
+  {t:"Répéter à toute la classe ce qu’on a dit sur un élève au conseil", a:"no", why:"Confidentialité ! Tu ne dis à chaque camarade que ce qui le concerne lui."},
+  {t:"Siéger au conseil d’administration du collège", a:"talk", lv:"43", why:"Seulement si tu es élu par l’assemblée des délégués pour représenter les élèves au CA."},
+  {t:"Relayer les informations sur l’orientation à la classe", a:"ok", lv:"43", why:"Oui, tu fais circuler les infos (dates, forums, rendez-vous Psy-EN…)."}
+];
+const TRI_COLS = {ok:{label:"✅ Son rôle", cls:"ok"}, no:{label:"❌ Pas son rôle", cls:"no"}, talk:{label:"❓ À discuter", cls:"talk"}};
+
+const DEBATE = [
+  {t:"Un délégué doit avoir de bonnes notes.", lv:"65", e:"Non. N’importe quel élève peut être élu. Ce qui compte : l’écoute, le sérieux et l’envie de représenter les autres."},
+  {t:"Le délégué doit dire aux profs quand un élève fait des bêtises.", lv:"65", e:"Le délégué n’est pas un espion. Mais s’il y a danger ou harcèlement, prévenir un adulte, c’est protéger."},
+  {t:"Le délégué doit être ami avec tout le monde.", lv:"65", e:"Pas obligé d’être ami avec tous, mais il doit représenter tout le monde de la même façon."},
+  {t:"Au conseil de classe, le délégué doit défendre tous les élèves.", e:"Il n’est pas l’avocat. Il apporte des informations utiles et objectives qui aident les professeurs à comprendre."},
+  {t:"Si la classe pense une chose et moi une autre, je dois quand même dire l’avis de la classe.", lv:"65", e:"Oui : tu es porte-parole, tu donnes l’avis majoritaire. Tu peux préciser que certains pensent autrement."},
+  {t:"Le délégué peut refuser de transmettre une demande de la classe s’il la trouve nulle.", lv:"43", e:"Il peut en discuter avec la classe et l’aider à la reformuler, mais il porte la parole collective, pas la sienne."},
+  {t:"Tout ce qui est dit au conseil de classe doit rester secret.", lv:"43", e:"Les informations individuelles sont confidentielles (seulement à l’élève concerné). Le bilan général, lui, doit être restitué à toute la classe."},
+  {t:"Un délégué qui a été sanctionné devrait démissionner.", lv:"43", e:"Le mandat ne dépend ni des notes ni des sanctions. Mais le délégué sait que son attitude compte aux yeux de la classe et des adultes."},
+  {t:"Les délégués ont un vrai pouvoir au collège.", lv:"43", e:"Ils participent, donnent des avis et peuvent porter des projets (CVC). Au conseil d’administration, les représentants élèves votent."},
+  {t:"Être délégué, ça prend trop de temps pour ce que ça rapporte.", e:"Ça demande de l’engagement, mais on apprend à parler devant des adultes, à défendre des idées, à écouter : des compétences pour la vie."}
+];
+
+const PEOPLE = [
+  {id:"pp", em:"👩‍🏫", n:"Professeur principal"},
+  {id:"prof", em:"📐", n:"Professeur de la matière"},
+  {id:"cpe", em:"🧭", n:"CPE"},
+  {id:"aed", em:"👀", n:"AED (surveillants)"},
+  {id:"inf", em:"🩺", n:"Infirmière"},
+  {id:"as", em:"🤝", n:"Assistante sociale"},
+  {id:"psy", em:"🎯", n:"Psy-EN"},
+  {id:"int", em:"🍽️", n:"Intendance"},
+  {id:"sec", em:"📄", n:"Secrétariat"},
+  {id:"dir", em:"🏛️", n:"Principale / adjoint"}
+];
+const SITU = [
+  {t:"Lucas a très mal à la tête en plein cours.", ok:["inf"], why:"Pour la santé, c’est l’infirmière (avec l’accord du professeur)."},
+  {t:"Toute la classe trouve qu’il y a trop d’évaluations la même semaine.", ok:["pp"], why:"Les conditions de travail de la classe : on en parle au professeur principal."},
+  {t:"La famille d’Inès a du mal à payer la cantine.", ok:["as","int"], why:"L’assistante sociale peut aider la famille, l’intendance s’occupe de la cantine et des bourses."},
+  {t:"Un élève se fait insulter tous les jours sur un groupe de messagerie.", ok:["cpe","pp"], why:"Harcèlement : on prévient vite la CPE ou le professeur principal. Numéro national : 3018."},
+  {t:"Tom a perdu sa carte de cantine.", ok:["int"], why:"Les questions matérielles de cantine, c’est l’intendance."},
+  {t:"Sarah se sent seule et n’arrive pas à s’intégrer dans la classe.", ok:["pp","cpe"], why:"L’intégration dans la classe : professeur principal ou CPE."},
+  {t:"Kenza ne comprend plus rien en mathématiques.", ok:["prof","pp"], why:"Les difficultés scolaires : d’abord le professeur de la matière, ou le professeur principal."},
+  {t:"Les parents de Malo demandent un certificat de scolarité.", ok:["sec"], why:"Les questions administratives : le secrétariat."},
+  {t:"Un camarade a des soucis à la maison qui l’empêchent de travailler.", ok:["as","cpe","inf"], why:"Problèmes familiaux : assistante sociale, CPE ou infirmière, qui sauront l’écouter."},
+  {t:"Il y a des bousculades tous les jours dans la file de la cantine.", ok:["cpe","aed"], why:"La vie scolaire (CPE et AED) s’occupe de la sécurité dans les espaces communs."},
+  {t:"Yanis n’a aucune idée du métier qu’il veut faire plus tard.", ok:["psy","pp"], lv:"43", why:"La Psy-EN est spécialiste de l’orientation. Le professeur principal accompagne aussi."},
+  {t:"Les délégués veulent proposer un projet pour améliorer la cour.", ok:["cpe","dir"], lv:"43", why:"On en parle à la CPE, et le projet peut passer par le CVC et la direction."}
+];
+
+const INST = [
+  {id:"cc", n:"Conseil de classe", clues:["Je me réunis à chaque fin de trimestre.","Je suis présidé par le chef d’établissement ou son adjoint.","Autour de ma table : professeurs, CPE, Psy-EN, 2 parents et 2 élèves.","J’examine les résultats de chaque élève et je donne des avis sur l’orientation."],
+    qui:"Chef d’établissement, PP, professeurs, CPE, Psy-EN, 2 parents, 2 délégués", quand:"3 fois par an", quoi:"Bilan de la classe, scolarité de chaque élève, avis d’orientation"},
+  {id:"ag", n:"Assemblée générale des délégués", clues:["Tous les délégués de classe du collège y sont convoqués.","Je me réunis surtout en début d’année.","Le chef d’établissement y informe et consulte les élèves.","C’est là que les délégués élisent leurs représentants au conseil d’administration."],
+    qui:"Tous les délégués de classe", quand:"Au moins une fois par an", quoi:"Informer, consulter, élire les représentants élèves au CA"},
+  {id:"cvc", n:"Conseil de la vie collégienne (CVC)", clues:["Je permets aux élèves de proposer des projets.","Je réunis des élèves, des personnels et parfois des parents.","Je donne des avis sur la vie quotidienne : la cour, les clubs, le climat scolaire…","Mon nom contient les mots « vie collégienne »."],
+    qui:"Élèves élus, personnels, parfois des parents", quand:"Plusieurs fois par an", quoi:"Propositions et projets pour améliorer la vie au collège"},
+  {id:"cd", n:"Conseil de discipline", clues:["Je ne me réunis pas à date fixe.","C’est le chef d’établissement qui me convoque.","On y entend les faits, l’élève et ses responsables, puis on vote à bulletin secret.","Je me réunis quand un élève a commis une faute grave."],
+    qui:"Direction, gestionnaire, CPE, représentants des personnels, des parents et des élèves", quand:"Quand un élève a commis une faute grave", quoi:"Écouter les faits, délibérer à bulletin secret, décider d’une sanction"},
+  {id:"ca", n:"Conseil d’administration", lv:"43", clues:["Je me réunis au moins 3 fois par an.","On y trouve des élus locaux et des représentants des personnels, des parents et des élèves.","Je vote le budget du collège.","Je vote aussi le règlement intérieur et le projet d’établissement."],
+    qui:"Direction, CPE, représentants des personnels, parents, élèves, élus locaux", quand:"Au moins 3 fois par an", quoi:"Vote le budget, le règlement intérieur, le projet d’établissement"},
+  {id:"cp", n:"Commission permanente", lv:"43", clues:["Je me réunis au moins 3 fois par an.","Je suis composée d’un petit nombre de membres du CA.","Un des deux élèves élus au CA y siège.","Je prépare les dossiers qui seront votés en CA."],
+    qui:"Un nombre réduit de membres du CA", quand:"Au moins 3 fois par an", quoi:"Prépare les dossiers traités en CA"},
+  {id:"ce", n:"Commission éducative", lv:"43", clues:["Je ne donne pas de sanction.","J’y retrouve le chef d’établissement, la CPE, au moins un professeur et un parent.","J’examine la situation d’un élève dont le comportement pose problème.","Je cherche une réponse éducative personnalisée."],
+    qui:"Direction, CPE, au moins 1 professeur et 1 parent", quand:"Selon les besoins", quoi:"Chercher une réponse éducative pour un élève au comportement inadapté"}
+];
+
+const SEATS = [
+  {n:"Chef d’établissement", d:"Préside le conseil, donne la parole et valide les avis."},
+  {n:"Professeur principal", d:"Fait le bilan général de la classe et présente chaque élève."},
+  {n:"Professeurs", d:"Donnent leur avis sur le travail et l’attitude dans leur matière."},
+  {n:"CPE", d:"Apporte le regard de la vie scolaire : absences, retards, comportement, vie de groupe."},
+  {n:"Psy-EN", d:"Psychologue de l’Éducation nationale, spécialiste de l’orientation."},
+  {n:"Parent", d:"Les 2 représentants des parents parlent au nom des familles et peuvent poser des questions."},
+  {n:"Délégué(e)", d:"C’est toi ! Tu portes la parole de la classe et tu apportes des informations utiles.", me:true},
+  {n:"Délégué(e)", d:"Ton binôme. Vous vous partagez la parole et la prise de notes.", me:true},
+  {n:"Parent", d:"Les 2 représentants des parents parlent au nom des familles et peuvent poser des questions."}
+];
+
+const STEPS = [
+  {t:"Consulter la classe (heure de vie de classe ou questionnaire)", ph:"Avant"},
+  {t:"Faire la synthèse de ce que la classe a dit", ph:"Avant"},
+  {t:"Préparer par écrit son intervention", ph:"Avant"},
+  {t:"Écouter le bilan général des professeurs sur la classe", ph:"Pendant"},
+  {t:"Donner l’avis majoritaire de la classe", ph:"Pendant"},
+  {t:"Lever la main pour apporter une info utile sur un camarade", ph:"Pendant"},
+  {t:"Noter l’avis et les conseils donnés pour chaque élève", ph:"Pendant"},
+  {t:"Faire le compte-rendu général à toute la classe", ph:"Après"},
+  {t:"Dire à chaque élève, en privé, ce qui le concerne", ph:"Après"}
+];
+
+const SCEN = [
+  {lv:"65", c:"Le professeur de mathématiques dit que la classe est très bavarde.", o:[
+    {t:"« C’est pas vrai, c’est vous qui criez tout le temps ! »", ok:false, f:"Agressif et irrespectueux : ça ferme le dialogue."},
+    {t:"« La classe reconnaît qu’il y a du bavardage, surtout en fin de journée. On propose d’en parler en vie de classe. »", ok:true, f:"Factuel, honnête, et ça propose une solution."},
+    {t:"« C’est surtout Mathis et Enzo, ils parlent tout le temps. »", ok:false, f:"Dénoncer des camarades, ce n’est pas ton rôle."}]},
+  {c:"On parle de Jade, dont les notes ont beaucoup baissé. Jade t’a confié que ses parents se séparent et t’a demandé de le signaler.", o:[
+    {t:"« Ses parents divorcent, son père a déménagé et ils se disputent tout le temps. »", ok:false, f:"Beaucoup trop de détails privés. On reste discret."},
+    {t:"Je ne dis rien, ce ne sont pas mes affaires.", ok:false, f:"Jade t’a demandé de le signaler : cette info aurait aidé les professeurs à la comprendre."},
+    {t:"« Jade traverse une période difficile à la maison, elle m’a autorisé(e) à vous le dire. »", ok:true, f:"Utile, discret, et avec son accord."}]},
+  {c:"Après le conseil, un camarade te demande : « Qu’est-ce qu’ils ont dit sur Lina ? »", o:[
+    {t:"« Je ne peux pas te le dire. Je le dirai à Lina seulement. »", ok:true, f:"Confidentialité respectée."},
+    {t:"« Le prof de français a dit qu’elle était paresseuse ! »", ok:false, f:"Tu trahis la confidentialité et tu déformes peut-être les propos."},
+    {t:"« Je te le dis, mais tu ne le répètes à personne. »", ok:false, f:"Un secret partagé n’est plus un secret : c’est toujours une faute."}]},
+  {lv:"65", c:"Le principal te demande l’avis de la classe sur l’ambiance.", o:[
+    {t:"« Moi, je trouve que ça va. »", ok:false, f:"C’est ton avis personnel, pas celui de la classe."},
+    {t:"« Nul, tout le monde se déteste. »", ok:false, f:"Exagéré et sans exemple : ça n’aide personne."},
+    {t:"« D’après le questionnaire, la majorité trouve l’ambiance bonne, mais plusieurs élèves se sentent à l’écart à la cantine. »", ok:true, f:"Avis majoritaire, appuyé sur la consultation, avec un point précis."}]},
+  {c:"Un professeur dit qu’Adam ne rend jamais ses devoirs. Adam t’a dit qu’il n’a pas d’ordinateur à la maison pour les devoirs en ligne.", o:[
+    {t:"« Adam a raison, les devoirs sont beaucoup trop longs ! »", ok:false, f:"Là, tu joues l’avocat, et ce n’est pas ce qu’Adam t’a dit."},
+    {t:"« Adam m’a dit qu’il n’a pas d’ordinateur chez lui, c’est pour ça qu’il ne rend pas les devoirs en ligne. »", ok:true, f:"Une info utile que les professeurs ne connaissaient pas."},
+    {t:"Je ne dis rien.", ok:false, f:"Dommage : ton information pouvait vraiment aider Adam."}]},
+  {lv:"43", c:"Un professeur lance : « C’est la pire classe que j’ai eue cette année. »", o:[
+    {t:"« Vous dites ça à toutes les classes. »", ok:false, f:"Insolent : tu perds toute crédibilité pour la suite du conseil."},
+    {t:"« La classe a conscience des difficultés. Pourriez-vous préciser ce qui pose problème, pour qu’on en parle en vie de classe ? »", ok:true, f:"Calme, constructif : tu transformes une critique en piste de travail."},
+    {t:"Je me tais, puis je raconte tout à la récré en exagérant.", ok:false, f:"Le compte-rendu doit être fidèle, sans déformer."}]},
+  {lv:"43", c:"Le conseil parle de l’orientation de Noah. Les professeurs pensent à une 2de générale, mais Noah t’a dit qu’il a un projet de bac pro cuisine.", o:[
+    {t:"« Noah m’a dit qu’il a un projet précis vers un bac pro cuisine. »", ok:true, f:"Une info utile, sans jugement, qui aide à respecter son projet."},
+    {t:"« De toute façon, Noah n’est pas fait pour la générale. »", ok:false, f:"Tu juges ton camarade : ce n’est pas ton rôle."},
+    {t:"« Il veut faire cuisine parce que ses parents ont des problèmes d’argent. »", ok:false, f:"Information privée qui n’a rien à faire ici."}]},
+  {lv:"43", c:"La classe trouve le mardi trop chargé (7 h de cours, dont 2 h de sport en fin de journée).", o:[
+    {t:"« On exige qu’on enlève les cours du mardi après-midi. »", ok:false, f:"Exiger ne marche pas : on propose et on explique."},
+    {t:"« Moi, le mardi, ça me va. »", ok:false, f:"Avis personnel, pas celui de la classe."},
+    {t:"« La majorité trouve le mardi très fatigant, surtout avec le sport en fin de journée. Une solution est-elle possible ? »", ok:true, f:"Avis majoritaire, précis, et une question ouverte."}]}
+];
+
+const NCOLS = [
+  {k:"niv", n:"Niveau", o:["Excellent","Ensemble très satisfaisant","Ensemble correct","Ensemble moyen","Ensemble faible","Ensemble très insuffisant"]},
+  {k:"trav", n:"Travail", o:["Régulier","En net progrès","De la bonne volonté","Irrégulier","Superficiel","Manque de travail"]},
+  {k:"comp", n:"Comportement", o:["Bonne participation","Sérieux","Faire des efforts","Difficultés d’attention","Élève agité","Perturbe la classe"]},
+  {k:"cons", n:"Conseils", o:["Continuez les efforts","Participez plus à l’oral","Travaillez à la maison","Faites des efforts !","Ne négligez aucune matière","Prenez confiance en vous"]},
+  {k:"ment", n:"Mention", o:["Félicitations","Compliments","Encouragements","Mise en garde travail","Mise en garde comportement","Aucune"]}
+];
+const APPR = [
+  {n:"Lucas", t:"Lucas obtient des résultats corrects dans l’ensemble. Il travaille régulièrement et il est sérieux en classe, mais on l’entend très peu : il doit oser lever la main. Encouragements.", a:{niv:"Ensemble correct", trav:"Régulier", comp:"Sérieux", cons:"Participez plus à l’oral", ment:"Encouragements"}},
+  {n:"Emma", t:"Un trimestre excellent pour Emma : des résultats remarquables, un travail régulier et une participation très active. Qu’elle continue ainsi ! Félicitations.", a:{niv:"Excellent", trav:"Régulier", comp:"Bonne participation", cons:"Continuez les efforts", ment:"Félicitations"}},
+  {n:"Rayan", t:"Les résultats de Rayan sont faibles. Le travail est irrégulier et il bavarde sans cesse, ce qui dérange ses camarades. Il doit se reprendre. Mise en garde pour le comportement.", a:{niv:"Ensemble faible", trav:"Irrégulier", comp:"Perturbe la classe", cons:"Faites des efforts !", ment:"Mise en garde comportement"}},
+  {n:"Chloé", t:"Ensemble moyen pour Chloé, mais en net progrès depuis la rentrée. Toujours sérieuse, elle doute beaucoup d’elle alors qu’elle en est capable. Encouragements.", a:{niv:"Ensemble moyen", trav:"En net progrès", comp:"Sérieux", cons:"Prenez confiance en vous", ment:"Encouragements"}},
+  {n:"Inès", lv:"43", t:"Inès a de très bons résultats en sciences mais délaisse les langues : ensemble correct. Le travail reste superficiel et elle a des difficultés d’attention en cours. Elle ne doit négliger aucune matière.", a:{niv:"Ensemble correct", trav:"Superficiel", comp:"Difficultés d’attention", cons:"Ne négligez aucune matière", ment:"Aucune"}},
+  {n:"Hugo", lv:"43", t:"Ensemble très insuffisant. Hugo manque de travail, en classe comme à la maison, et il est agité en cours. Il doit se mettre au travail personnel dès maintenant. Mise en garde pour le travail.", a:{niv:"Ensemble très insuffisant", trav:"Manque de travail", comp:"Élève agité", cons:"Travaillez à la maison", ment:"Mise en garde travail"}}
+];
+
+const QUAL = [
+  {w:"À L’ÉCOUTE", fixed:"À L’", h:"Je prends le temps d’entendre l’avis de chacun avant de parler."},
+  {w:"RESPECTUEUX", h:"Je parle poliment, même quand je ne suis pas d’accord avec un adulte."},
+  {w:"DISCRET", h:"Ce que j’apprends sur un camarade au conseil, je le garde pour moi."},
+  {w:"RESPONSABLE", h:"Je tiens mes engagements et je rends compte à la classe."},
+  {w:"DYNAMIQUE", h:"Je propose des idées et je fais bouger la classe."},
+  {w:"JUSTE", h:"Je représente tout le monde de la même façon, pas seulement mes amis."},
+  {w:"OBJECTIF", lv:"43", h:"Je rapporte les faits sans les déformer ni les exagérer."},
+  {w:"DIPLOMATE", lv:"43", h:"Je sais dire les choses difficiles avec tact."}
+];
+
+const QUIZ = [
+  {q:"Combien de fois par an se réunit le conseil de classe ?", o:["1 fois","2 fois","3 fois","Chaque mois"], a:2, w:"À chaque fin de trimestre."},
+  {q:"Qui préside le conseil de classe ?", o:["Le professeur principal","La CPE","Le chef d’établissement ou son adjoint","Les délégués"], a:2, w:"Le chef d’établissement ou son adjoint."},
+  {q:"Combien de délégués élèves siègent au conseil de classe ?", o:["1","2","4","Toute la classe"], a:1, w:"2 délégués élèves, et 2 représentants des parents."},
+  {q:"Après le conseil, Paul te demande ce qu’on a dit sur Lina. Tu…", o:["lui racontes tout","lui fais un petit résumé","le diras à Lina seulement","lui dis d’aller voir le prof"], a:2, w:"Confidentialité : chacun n’apprend que ce qui le concerne."},
+  {q:"Le délégué, c’est…", o:["le chef de la classe","le porte-parole de toute la classe","l’avocat de ses amis","l’assistant du professeur"], a:1, w:"Il représente toute la classe."},
+  {q:"Avant le conseil, le plus important est de…", o:["réviser ses leçons","consulter ses camarades","préparer des questions pièges","demander ses notes"], a:1, w:"Heure de vie de classe ou questionnaire."},
+  {q:"Pendant le conseil, il faut…", o:["tout écrire mot pour mot","noter l’essentiel et surtout écouter","discuter avec l’autre délégué","ne rien noter"], a:1, w:"Et vous vous partagez la prise de notes."},
+  {lv:"65", q:"Un élève a perdu sa carte de cantine. Il va voir…", o:["l’infirmière","l’intendance","le professeur de sport","la Psy-EN"], a:1, w:"Les questions matérielles : l’intendance."},
+  {lv:"65", q:"Le conseil de discipline se réunit…", o:["chaque trimestre","quand un élève a commis une faute grave","le jour des élections","jamais au collège"], a:1, w:"Il est convoqué par le chef d’établissement."},
+  {lv:"43", q:"Quelle instance vote le budget du collège ?", o:["Le conseil de classe","Le conseil d’administration","La commission éducative","Le CVC"], a:1, w:"Le CA vote aussi le règlement intérieur."},
+  {lv:"43", q:"Au conseil de classe, qui est spécialiste de l’orientation ?", o:["La CPE","La Psy-EN","L’intendante","Le délégué"], a:1, w:"La psychologue de l’Éducation nationale."}
+];
+
+const METEO = [{e:"☀️", n:"Génial"},{e:"🌤️", n:"Bien"},{e:"⛅", n:"Bof"},{e:"🌧️", n:"Pas trop"},{e:"⛈️", n:"Pas du tout"}];
+
+/* ============ ÉTAT ============ */
+const COLORS = ["yellow","pink","green","blue"];
+const state = {level:null, step:-1, teams:[{name:"Jaune"},{name:"Rose"},{name:"Verte"},{name:"Bleue"}].map((t,i)=>({...t, color:COLORS[i], score:0})), b:{}};
+function save(){ try{ localStorage.setItem("deleg-form", JSON.stringify({level:state.level, step:state.step, teams:state.teams})); }catch(e){} }
+function load(){ try{ const s=JSON.parse(localStorage.getItem("deleg-form")||"null"); if(s&&s.teams&&s.teams.length===4){ state.level=s.level; state.teams=s.teams; return s; } }catch(e){} return null; }
+
+/* ============ OUTILS ============ */
+const $ = (s,r=document)=>r.querySelector(s);
+const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
+const esc = s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const shuffle = a=>{a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a;};
+const forLv = arr=>arr.filter(x=>!x.lv||x.lv===state.level);
+const norm = s=>s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase();
+const fmt = s=>String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
+const lvlName = ()=>state.level==="65"?"6e – 5e":"4e – 3e";
+
+function award(pts, label){
+  return `<div class="award"><span>${label||"Points"} <b>+${pts}</b> pour :</span>${state.teams.map((t,i)=>`<button class="chip-btn c-${t.color}" data-award="${i}" data-pts="${pts}">${esc(t.name)}</button>`).join("")}</div>`;
+}
+function renderScores(flash){
+  $("#scores").innerHTML = state.teams.map((t,i)=>`<div class="team c-${t.color}${i===flash?" flash":""}"><span class="tn">${esc(t.name)}</span><span class="ts">${t.score}</span><button data-sc="${i}" data-d="-1" aria-label="Retirer un point">−</button><button data-sc="${i}" data-d="1" aria-label="Ajouter un point">+</button></div>`).join("");
+  if(flash!=null) setTimeout(()=>{const el=$$(".team")[flash]; el&&el.classList.remove("flash");},250);
+  $("#lvlTag").textContent = state.level&&state.step>=0 ? lvlName() : "";
+}
+document.addEventListener("click", e=>{
+  const sc=e.target.closest("[data-sc]");
+  if(sc){ const i=+sc.dataset.sc; state.teams[i].score=Math.max(0,state.teams[i].score+(+sc.dataset.d)); renderScores(i); save(); return; }
+  const a=e.target.closest("[data-award]");
+  if(a){ const i=+a.dataset.award; state.teams[i].score+=+a.dataset.pts; a.disabled=true; a.classList.add("given"); renderScores(i); save(); }
+});
+
+/* ============ CHRONO ============ */
+const T={left:0,total:0,run:false,h:null,over:false};
+function setTimer(sec,auto){ clearInterval(T.h); T.run=false; T.over=false; T.total=T.left=sec; drawTimer(); if(auto) startTimer(); }
+function startTimer(){ if(T.left<=0) T.left=T.total; T.over=false; T.run=true; clearInterval(T.h);
+  T.h=setInterval(()=>{ T.left--; if(T.left<=0){ T.left=0; T.run=false; T.over=true; clearInterval(T.h); ding(); } drawTimer(); },1000); drawTimer(); }
+function pauseTimer(){ T.run=false; clearInterval(T.h); drawTimer(); }
+function drawTimer(){ $("#tmTime").textContent=fmt(T.left); $("#tmPlay").textContent=T.run?"⏸":"▶";
+  const el=$("#timer"); el.classList.toggle("ending",T.run&&T.left<=10); el.classList.toggle("over",T.over); }
+function ding(){ try{ const c=new (window.AudioContext||window.webkitAudioContext)(); [0,.25,.5].forEach(d=>{ const o=c.createOscillator(), g=c.createGain(); o.frequency.value=880; o.connect(g); g.connect(c.destination); g.gain.setValueAtTime(.2,c.currentTime+d); g.gain.exponentialRampToValueAtTime(.001,c.currentTime+d+.2); o.start(c.currentTime+d); o.stop(c.currentTime+d+.22); }); }catch(e){} }
+$("#tmPlay").onclick=()=>T.run?pauseTimer():startTimer();
+$("#tmReset").onclick=()=>setTimer(T.total);
+$("#tmPlus").onclick=()=>{ T.left+=60; T.total=Math.max(T.total,T.left); T.over=false; drawTimer(); };
+
+/* ============ NAVIGATION ============ */
+function head(b){ return `<header class="bh"><div><h1>${b.title}</h1><p class="lead">${b.lead}</p></div><div class="meta"><span>⏱ ${b.dur} min</span>${b.livret?`<span class="liv">📘 Livret : ${b.livret}</span>`:""}</div></header>`; }
+function go(i){
+  state.step=Math.max(-1,Math.min(BLOCKS.length-1,i)); save();
+  const st=$("#stage"); st.scrollTop=0;
+  if(state.step<0){ $("#bottom").hidden=true; renderHome(st); setTimer(0); renderScores(); return; }
+  $("#bottom").hidden=false;
+  const b=BLOCKS[state.step];
+  st.innerHTML=`<article class="sheet"><div class="mnum">${state.step+1}</div><div id="sb"></div></article>`;
+  b.render($("#sb"));
+  setTimer(b.dur*60);
+  $("#stepBtn").textContent=`☰ ${state.step+1} / ${BLOCKS.length}  ${b.title}`;
+  $("#prevBtn").disabled=false;
+  $("#nextBtn").textContent = state.step===BLOCKS.length-1 ? "Accueil" : "Suivant ▶";
+  renderScores();
+}
+function refresh(){ BLOCKS[state.step].render($("#sb")); }
+$("#prevBtn").onclick=()=>go(state.step-1);
+$("#nextBtn").onclick=()=>go(state.step===BLOCKS.length-1?-1:state.step+1);
+$("#stepBtn").onclick=openDrawer;
+$("#drawer").onclick=e=>{ if(e.target.id==="drawer") $("#drawer").hidden=true; };
+function openDrawer(){
+  const tot=BLOCKS.reduce((s,b)=>s+b.dur,0);
+  $("#drawerPanel").innerHTML=`<h2>Sommaire</h2><p class="counter">Durée totale : environ ${Math.floor(tot/60)} h ${String(tot%60).padStart(2,"0")}. Passe une étape si le temps manque.</p><ol>${BLOCKS.map((b,i)=>`<li class="${i===state.step?"cur":""}"><button data-go="${i}"><span class="n">${i+1}</span>${b.title}<span class="d">${b.dur} min</span></button></li>`).join("")}<li><button data-go="-1"><span class="n">⌂</span>Retour à l’accueil</button></li></ol><p class="copy">© 2026 Eude Florian. Collège Yves du Manoir.</p>`;
+  $$("[data-go]",$("#drawerPanel")).forEach(x=>x.onclick=()=>{ $("#drawer").hidden=true; go(+x.dataset.go); });
+  $("#drawer").hidden=false;
+}
+document.addEventListener("keydown",e=>{
+  if(e.target.matches("input,textarea")||state.step<0) return;
+  if(e.key==="ArrowRight") $("#nextBtn").click();
+  if(e.key==="ArrowLeft") go(state.step-1);
+  if(e.key==="Escape") $("#drawer").hidden=true;
+});
+
+/* ============ ACCUEIL ============ */
+function renderHome(el){
+  el.innerHTML=`<div class="home">
+    <h1>Formation des délégués de classe</h1>
+    <p class="sub">Collège Yves du Manoir, année 2025-2026</p>
+    <p class="howto" style="margin:-1.2rem 0 2rem; font-size:1.1rem">Formation animée par M. Deston, conseiller principal d’éducation.</p>
+    <h2>Quel groupe aujourd’hui ?</h2>
+    <div class="lvl-pick">
+      <button data-lv="65" class="${state.level==="65"?"on":""}"><b>6e – 5e</b>Découvrir le rôle, le conseil de classe et les bons interlocuteurs.</button>
+      <button data-lv="43" class="${state.level==="43"?"on":""}"><b>4e – 3e</b>Les mêmes bases, plus les instances (CA, commissions) et l’orientation.</button>
+    </div>
+    <h2>Les 4 équipes</h2>
+    <div class="teams-edit">${state.teams.map((t,i)=>`<label class="c-${t.color}">Équipe <input data-tn="${i}" value="${esc(t.name)}" maxlength="16" aria-label="Nom de l’équipe ${i+1}"></label>`).join("")}</div>
+    <div class="row">
+      <button class="btn big" id="startBtn" ${state.level?"":"disabled"}>Commencer la formation</button>
+      <button class="btn ghost" id="resetBtn">Remettre les scores à zéro</button>
+    </div>
+    <p class="howto" style="margin-top:2rem">Mode d’emploi : M. Deston pilote au vidéoprojecteur. Les élèves répondent par équipe, à main levée. Les points se donnent avec les boutons sous chaque jeu, ou avec + et − en haut à droite. Les flèches du clavier permettent d’avancer et de reculer, et le chronomètre se règle tout seul à chaque étape.</p>
+    <p class="copy">© 2026 Eude Florian. Application conçue pour la formation des délégués du collège Yves du Manoir, avec M. Deston, CPE. Tous droits réservés.</p>
+  </div>`;
+  $$("[data-lv]",el).forEach(b=>b.onclick=()=>{ if(state.level!==b.dataset.lv){ state.level=b.dataset.lv; state.b={}; } save(); renderHome(el); });
+  $$("[data-tn]",el).forEach(inp=>inp.oninput=()=>{ state.teams[+inp.dataset.tn].name=inp.value.trim()||"Équipe "+(+inp.dataset.tn+1); save(); renderScores(); });
+  $("#startBtn",el).onclick=()=>{ state.b={}; go(0); };
+  $("#resetBtn",el).onclick=()=>{ state.teams.forEach(t=>t.score=0); save(); renderScores(); };
+}
+
+/* ============ ÉTAPES ============ */
+const BLOCKS = [
+{id:"cadre", title:"Bienvenue !", dur:3, lead:"Une formation pour comprendre ton rôle et t’entraîner avant le prochain conseil de classe.", render(el){
+  el.innerHTML=head(this)+`<div class="grid2"><div>
+    <h2>Le cadre de travail</h2>
+    <ul class="rules"><li><span>✓</span>Je respecte le temps de parole de chacun</li><li><span>✓</span>Je ne porte aucun jugement</li><li><span>✓</span>Je participe activement</li></ul>
+    <p class="hand ink">Ici, pas de mauvaise réponse : on apprend en se trompant.</p></div>
+    <div class="card"><h2 style="margin-top:0">Au programme</h2><ol class="menu-list">${BLOCKS.slice(1).map(b=>`<li>${b.title}</li>`).join("")}</ol></div></div>`;
+}},
+{id:"nuage", title:"Pourquoi délégué(e) ?", dur:5, lead:"Chacun donne un mot. Clique sur un mot pour le faire grossir quand il revient.", render(el){
+  const S=state.b.cloud||(state.b.cloud={words:{},showQ:false});
+  const max=Math.max(1,...Object.values(S.words));
+  const pal=["var(--ink)","var(--margin)","var(--ok)","var(--mid)","var(--ink-soft)"];
+  const ws=Object.entries(S.words);
+  el.innerHTML=head(this)+`<p class="big-text" style="margin:0 0 1rem">Pourquoi as-tu voulu être délégué(e) ?</p>
+    <form class="cloud-form" id="cf"><input id="ci" placeholder="Tape un mot, puis Entrée" autocomplete="off" maxlength="30"><button class="btn">Ajouter</button></form>
+    <div class="cloud">${ws.length?ws.map(([w,c],i)=>`<button class="w" data-w="${esc(w)}" style="font-size:${(1.1+2.6*(c-1)/Math.max(1,max-1)*(max>1?1:0)).toFixed(2)}rem;color:${pal[i%pal.length]}">${esc(w)}${c>1?`<sup> ${c}</sup>`:""}<span class="x" data-del="${esc(w)}" title="Retirer">×</span></button>`).join(""):`<span class="cloud-empty">Les mots des délégués apparaîtront ici…</span>`}</div>
+    <div class="row center" style="margin-top:1rem"><button class="btn ghost" id="qb">${S.showQ?"Masquer":"Afficher"} la phrase de transition</button></div>
+    ${S.showQ?`<p class="quote">« Être délégué, ce n’est pas juste porter le brassard : c’est représenter, écouter et agir. »</p>`:""}`;
+  $("#cf",el).onsubmit=e=>{ e.preventDefault(); const v=$("#ci",el).value.trim().toLowerCase(); if(v){ S.words[v]=(S.words[v]||0)+1; refresh(); $("#ci").focus(); } };
+  $$(".w",el).forEach(b=>b.onclick=e=>{ const d=e.target.closest("[data-del]"); if(d){ delete S.words[d.dataset.del]; } else S.words[b.dataset.w]++; refresh(); });
+  $("#qb",el).onclick=()=>{ S.showQ=!S.showQ; refresh(); };
+  if(!ws.length) $("#ci",el).focus();
+}},
+{id:"tri", title:"Son rôle, ou pas ?", dur:10, livret:"« Je suis délégué(e)… »", lead:"Une carte, trois colonnes. La classe décide, l’animateur clique sur la colonne choisie, puis on corrige.", render(el){
+  const S=state.b.tri||(state.b.tri={deck:shuffle(forLv(TRI)), i:0, placed:{ok:[],no:[],talk:[]}, choice:null});
+  const done=S.i>=S.deck.length, card=S.deck[S.i];
+  const colHtml=k=>{ const items=S.placed[k]; return `<button class="col ${TRI_COLS[k].cls}" data-col="${k}" ${S.choice||done?"disabled":""}><h3>${TRI_COLS[k].label}<span>${items.length}</span></h3>${items.map(c=>`<span class="mini${c.a!==k&&k!=="talk"?" wrong":""}">${esc(c.t)}</span>`).join("")}</button>`; };
+  let fb="";
+  if(S.choice&&card){
+    const good = S.choice===card.a, talk = S.choice==="talk";
+    fb=`<div class="fb ${good?"":talk?"mid":"bad"}"><span class="hand ${good?"":talk?"mid":"bad"}">${good?"Bien vu":talk?"Mise de côté pour le débat mouvant":"Pas tout à fait"}. Réponse attendue : ${TRI_COLS[card.a].label}</span><p>${card.why}</p></div>${award(1,"Bonne réponse ou bon argument :")}`;
+  }
+  el.innerHTML=head(this)+(done
+    ? `<p class="hand ink" style="text-align:center">Toutes les cartes sont triées. Les cartes ❓ seront débattues à l’étape suivante.</p>`
+    : `<p class="counter" style="text-align:center">Carte ${S.i+1} / ${S.deck.length}</p><div class="tri-card"><div class="big-text">${esc(card.t)}</div></div>`)
+    +`<div class="cols">${colHtml("ok")}${colHtml("no")}${colHtml("talk")}</div>${fb}
+    ${S.choice&&!done?`<div class="row end" style="margin-top:1rem"><button class="btn" id="nx">Carte suivante</button></div>`:""}`;
+  $$("[data-col]",el).forEach(b=>b.onclick=()=>{ S.choice=b.dataset.col; S.placed[S.choice].push(card); refresh(); });
+  const nx=$("#nx",el); if(nx) nx.onclick=()=>{ S.i++; S.choice=null; refresh(); };
+}},
+{id:"debat", title:"Débat mouvant", dur:12, lead:"D’accord d’un côté de la salle, pas d’accord de l’autre. Personne ne reste au milieu !", render(el){
+  const S=state.b.deb||(state.b.deb={i:0, show:false, yes:0, no:0});
+  const fromTri=(state.b.tri?state.b.tri.placed.talk:[]).map(c=>({t:"Est-ce le rôle du délégué : « "+c.t.charAt(0).toLowerCase()+c.t.slice(1)+" » ?", e:c.why, tri:true}));
+  const list=[...fromTri,...forLv(DEBATE)];
+  if(S.i>=list.length) S.i=list.length-1;
+  const it=list[S.i];
+  el.innerHTML=head(this)+`<p class="counter">Affirmation ${S.i+1} / ${list.length}${it.tri?" : carte mise de côté au tri":""}</p>
+    <div class="deb">
+      <div class="zone no">Pas d’accord<div class="cnt"><button data-z="no" data-d="-1">−</button>${S.no}<button data-z="no" data-d="1">+</button></div></div>
+      <div class="deb-st"><div class="big-text">${esc(it.t)}</div>${S.show?`<p class="hand ink" style="margin-top:1rem">${esc(it.e)}</p>`:""}</div>
+      <div class="zone yes">D’accord<div class="cnt"><button data-z="yes" data-d="-1">−</button>${S.yes}<button data-z="yes" data-d="1">+</button></div></div>
+    </div>
+    <div class="row" style="margin-top:1rem; justify-content:space-between">
+      <div class="row"><button class="btn ghost" id="t2">⏱ 2 min de débat</button><button class="btn ghost" id="ec">${S.show?"Masquer":"Afficher"} l’éclairage</button></div>
+      <div class="row"><button class="btn ghost" id="pv" ${S.i===0?"disabled":""}>◀ Précédente</button><button class="btn" id="nv" ${S.i>=list.length-1?"disabled":""}>Affirmation suivante</button></div>
+    </div>
+    <details class="rules-box"><summary>Rappel des règles du débat mouvant</summary><ul>
+      <li>Après chaque affirmation, chacun se déplace : d’accord d’un côté, pas d’accord de l’autre.</li>
+      <li>Un camp donne un argument, puis c’est au tour de l’autre camp : c’est un ping-pong.</li>
+      <li>Si un argument te convainc, tu as le droit de changer de camp.</li>
+      <li>On commence par ceux qui sont le plus sûrs de leur position.</li></ul></details>
+    ${award(1,"Meilleur argument :")}`;
+  $$("[data-z]",el).forEach(b=>b.onclick=()=>{ S[b.dataset.z]=Math.max(0,S[b.dataset.z]+(+b.dataset.d)); refresh(); });
+  $("#t2",el).onclick=()=>setTimer(120,true);
+  $("#ec",el).onclick=()=>{ S.show=!S.show; refresh(); };
+  $("#pv",el).onclick=()=>{ S.i--; S.show=false; S.yes=S.no=0; refresh(); };
+  $("#nv",el).onclick=()=>{ S.i++; S.show=false; S.yes=S.no=0; refresh(); };
+}},
+{id:"casq", title:"Les 4 casquettes du délégué", dur:4, livret:"« En résumé, un délégué compétent… »", lead:"Lis la définition, fais deviner la casquette, puis clique pour la révéler.", render(el){
+  const S=state.b.casq||(state.b.casq={open:[]});
+  const C=[{c:"c-yellow",em:"📣",n:"Porte-parole",d:"Je représente toute la classe et je parle en son nom."},
+           {c:"c-blue",em:"🔁",n:"Relais",d:"Je dialogue avec les adultes du collège et je fais circuler l’information dans les deux sens."},
+           {c:"c-green",em:"🎙️",n:"Animateur",d:"Je favorise le dialogue dans ma classe : je consulte, je fais parler chacun."},
+           {c:"c-pink",em:"🤝",n:"Médiateur",d:"J’aide et je conseille mes camarades, je les oriente vers le bon adulte."}];
+  el.innerHTML=head(this)+`<div class="caps">${C.map((x,i)=>`<button class="cap ${x.c}" data-cap="${i}"><span class="em">${x.em}</span><span class="def">${x.d}</span><span class="nm ${S.open.includes(i)?"":"hid"}">${S.open.includes(i)?x.n:"? ? ?"}</span></button>`).join("")}</div>
+  <div class="card" style="margin-top:2rem"><span class="hand ink">La délégation, c’est un contrat de confiance entre la classe et ses délégués.</span><p style="margin:.4rem 0 0">Pour être crédible auprès des adultes, il faut prendre l’avis de ses camarades : c’est la consultation.</p></div>`;
+  $$("[data-cap]",el).forEach(b=>b.onclick=()=>{ const i=+b.dataset.cap; S.open=S.open.includes(i)?S.open.filter(x=>x!==i):[...S.open,i]; refresh(); });
+}},
+{id:"qui", title:"Vers qui je l’envoie ?", dur:6, livret:"« Vers qui me tourner si j’ai une question ? »", lead:"Un camarade vient te voir avec un problème. À quel adulte du collège l’adresser ?", render(el){
+  const S=state.b.qui||(state.b.qui={deck:shuffle(forLv(SITU)), i:0, picked:null});
+  if(S.i>=S.deck.length){ el.innerHTML=head(this)+`<p class="hand ink">Toutes les situations sont passées. Bravo !</p><button class="btn ghost" id="rs">Rejouer</button>`; $("#rs",el).onclick=()=>{ delete state.b.qui; refresh(); }; return; }
+  const s=S.deck[S.i];
+  el.innerHTML=head(this)+`<p class="counter">Situation ${S.i+1} / ${S.deck.length}</p><div class="situ">${esc(s.t)}</div>
+    <div class="opts">${PEOPLE.map(p=>{ let cls=""; if(S.picked){ if(s.ok.includes(p.id)) cls="right"; else if(S.picked===p.id) cls="wrong"; } return `<button class="opt ${cls}" data-p="${p.id}" ${S.picked?"disabled":""}><span class="em">${p.em}</span>${p.n}</button>`; }).join("")}</div>
+    ${S.picked?`<div class="fb ${s.ok.includes(S.picked)?"":"bad"}"><span class="hand ${s.ok.includes(S.picked)?"":"bad"}">${s.ok.includes(S.picked)?"Exactement !":"Pas le meilleur choix."}</span><p>${s.why}</p></div>${award(1)}<div class="row end" style="margin-top:1rem"><button class="btn" id="nx">Situation suivante</button></div>`:""}`;
+  $$("[data-p]",el).forEach(b=>b.onclick=()=>{ S.picked=b.dataset.p; refresh(); });
+  const nx=$("#nx",el); if(nx) nx.onclick=()=>{ S.i++; S.picked=null; refresh(); };
+}},
+{id:"inst", title:"Devine l’instance", dur:7, livret:"« Plusieurs instances dans un collège… »", lead:"Les indices arrivent un par un. Moins tu en utilises, plus tu marques de points.", render(el){
+  const S=state.b.inst||(state.b.inst={deck:shuffle(forLv(INST)), i:0, clues:1, wrong:[], found:false});
+  if(S.i>=S.deck.length){ el.innerHTML=head(this)+`<p class="hand ink">Toutes les instances ont été trouvées !</p><button class="btn ghost" id="rs">Rejouer</button>`; $("#rs",el).onclick=()=>{ delete state.b.inst; refresh(); }; return; }
+  const it=S.deck[S.i], pts=Math.max(1,5-S.clues);
+  const all=forLv(INST);
+  el.innerHTML=head(this)+`<div class="row" style="justify-content:space-between"><span class="counter">Instance ${S.i+1} / ${S.deck.length}</span><span class="pts">${S.found?"Trouvé !":"En jeu : "+pts+" pt"+(pts>1?"s":"")}</span></div>
+    <ol class="clues">${it.clues.map((c,k)=>k<S.clues||S.found?`<li><span class="n">${k+1}</span>${esc(c)}</li>`:`<li class="hidden"><span class="n">${k+1}</span>Indice caché</li>`).join("")}</ol>
+    ${!S.found&&S.clues<4?`<div class="row" style="margin-bottom:1rem"><button class="btn ghost" id="mc">Indice suivant (−1 point)</button></div>`:""}
+    <div class="opts">${all.map(x=>{ let cls=""; if(S.found&&x.id===it.id) cls="right"; else if(S.wrong.includes(x.id)) cls="wrong"; return `<button class="opt ${cls}" data-i="${x.id}" ${S.found||S.wrong.includes(x.id)?"disabled":""}>${esc(x.n)}</button>`; }).join("")}</div>
+    ${S.found?`<div class="fb"><span class="hand">${esc(it.n)}</span><div class="fiche"><b>Qui ?</b><span>${esc(it.qui)}</span><b>Quand ?</b><span>${esc(it.quand)}</span><b>Quoi ?</b><span>${esc(it.quoi)}</span></div></div>${award(pts)}<div class="row end" style="margin-top:1rem"><button class="btn" id="nx">Instance suivante</button></div>`:""}`;
+  const mc=$("#mc",el); if(mc) mc.onclick=()=>{ S.clues++; refresh(); };
+  $$("[data-i]",el).forEach(b=>b.onclick=()=>{ if(b.dataset.i===it.id) S.found=true; else { S.wrong.push(b.dataset.i); if(S.clues<4) S.clues++; } refresh(); });
+  const nx=$("#nx",el); if(nx) nx.onclick=()=>{ S.i++; S.clues=1; S.wrong=[]; S.found=false; refresh(); };
+}},
+{id:"conseil", title:"Le conseil de classe", dur:5, livret:"« Le conseil de classe »", lead:"Un moment privilégié : tous ceux qui interviennent dans ta classe autour d’une même table, à chaque fin de trimestre.", render(el){
+  const S=state.b.cons||(state.b.cons={tab:0, seat:6});
+  const tabs=["Autour de la table","À quoi il sert","Les règles d’or"];
+  let body="";
+  if(S.tab===0){
+    const n=SEATS.length;
+    body=`<div class="table-wrap"><div class="rtable"><div class="tbl">Conseil de classe</div>${SEATS.map((s,i)=>{ const a=-Math.PI/2+i*2*Math.PI/n; const x=50+40*Math.cos(a), y=50+40*Math.sin(a); return `<button class="seat${s.me?" me":""}${S.seat===i?" on":""}" data-seat="${i}" style="left:${x.toFixed(1)}%;top:${y.toFixed(1)}%">${s.n}</button>`; }).join("")}</div>
+      <div class="card"><span class="hand ink">${SEATS[S.seat].n}</span><p style="font-size:1.25rem; margin:.5rem 0 0">${SEATS[S.seat].d}</p><p class="counter" style="margin-top:1rem">Clique sur une place autour de la table.</p></div></div>`;
+  } else if(S.tab===1){
+    body=`<div class="grid2"><div><h2>Son rôle</h2><ul class="list-big"><li>Examiner les questions pédagogiques, notamment l’organisation du travail des élèves.</li><li>Examiner la scolarité de chaque élève (éléments éducatifs, médicaux, sociaux).</li><li>Émettre des avis sur l’orientation des élèves.${state.level==="43"?" En 3e, c’est lui qui donne l’avis sur les vœux d’orientation après la 3e.":""}</li></ul></div>
+      <div><h2>Ton rôle de délégué</h2><p style="font-size:1.15rem">Tu es efficace si tu as de bonnes informations sur :</p><ul class="list-big"><li>les problèmes collectifs : climat de classe, travail, relations entre élèves et avec les adultes ;</li><li>les problèmes individuels : santé, famille, scolarité… seulement si le camarade t’a demandé d’en parler.</li></ul></div></div>`;
+  } else {
+    body=`<div class="grid2"><div><ol class="list-big"><li>Lever la main pour prendre la parole.</li><li>Articuler, parler assez fort, surveiller son langage. Ne pas bavarder avec l’autre délégué.</li><li>Respecter la politesse.</li><li>Ne pas tout écrire : noter l’essentiel et surtout écouter.</li><li>Se répartir la prise de notes avec son binôme.</li></ol></div>
+      <div class="sticky"><h3>Attention, confidentiel !</h3><p style="margin:0; font-size:1.15rem">Ce que tu apprends sur tes camarades au conseil est confidentiel. Tu dis à chacun seulement ce qui le concerne.</p></div></div>`;
+  }
+  el.innerHTML=head(this)+`<div class="tabs">${tabs.map((t,i)=>`<button class="${S.tab===i?"on":""}" data-tab="${i}">${t}</button>`).join("")}</div>${body}`;
+  $$("[data-tab]",el).forEach(b=>b.onclick=()=>{ S.tab=+b.dataset.tab; refresh(); });
+  $$("[data-seat]",el).forEach(b=>b.onclick=()=>{ S.seat=+b.dataset.seat; refresh(); });
+}},
+{id:"ordre", title:"Avant, pendant, après", dur:7, livret:"« Avant », « Pendant », « Après le conseil »", lead:"Remets les étapes du délégué dans l’ordre. Glisse les étiquettes ou utilise les flèches.", render(el){
+  const S=state.b.ord||(state.b.ord={order:shuffle(STEPS.map((_,i)=>i)), checked:false});
+  const cls=p=>{ if(!S.checked) return ""; const id=S.order[p]; if(id===p) return "ex"; return STEPS[id].ph===STEPS[p].ph?"ph":"ko"; };
+  const nOk=S.order.filter((id,p)=>id===p).length;
+  el.innerHTML=head(this)+`<ul class="order" id="ol">${S.order.map((id,p)=>`<li draggable="true" data-k="${p}" class="${cls(p)}"><span class="pos">${p+1}</span><span class="t">${esc(STEPS[id].t)}</span>${S.checked?`<span class="tag">${STEPS[id].ph}</span>`:""}<span class="arr"><button data-mv="${p}" data-d="-1" aria-label="Monter">▲</button><button data-mv="${p}" data-d="1" aria-label="Descendre">▼</button></span></li>`).join("")}</ul>
+    ${S.checked?`<div class="legend"><span class="l1">Bonne place</span><span class="l2">Bon moment (avant, pendant ou après), mais pas la bonne place</span><span class="l3">Mauvais moment</span></div><p class="hand ${nOk===STEPS.length?"":"mid"}">${nOk===STEPS.length?"Parfait, tout est dans l’ordre !":nOk+" étiquette"+(nOk>1?"s":"")+" sur "+STEPS.length+" à la bonne place."}</p>${award(nOk===STEPS.length?3:1)}`:""}
+    <div class="row" style="margin-top:1rem"><button class="btn" id="ck">Vérifier</button><button class="btn ghost" id="sol">Montrer la solution</button><button class="btn ghost" id="mx">Mélanger</button></div>`;
+  const move=(f,t)=>{ if(t<0||t>=S.order.length||f===t) return; S.order.splice(t,0,S.order.splice(f,1)[0]); S.checked=false; refresh(); };
+  let from=null;
+  $$("#ol li",el).forEach(li=>{
+    li.addEventListener("dragstart",e=>{ from=+li.dataset.k; li.classList.add("dragging"); e.dataTransfer.effectAllowed="move"; try{e.dataTransfer.setData("text/plain","x");}catch(_){} });
+    li.addEventListener("dragend",()=>li.classList.remove("dragging"));
+    li.addEventListener("dragover",e=>{ e.preventDefault(); li.classList.add("over"); });
+    li.addEventListener("dragleave",()=>li.classList.remove("over"));
+    li.addEventListener("drop",e=>{ e.preventDefault(); if(from!=null) move(from,+li.dataset.k); from=null; });
+  });
+  $$("[data-mv]",el).forEach(b=>b.onclick=()=>move(+b.dataset.mv, +b.dataset.mv + (+b.dataset.d)));
+  $("#ck",el).onclick=()=>{ S.checked=true; refresh(); };
+  $("#sol",el).onclick=()=>{ S.order=STEPS.map((_,i)=>i); S.checked=true; refresh(); };
+  $("#mx",el).onclick=()=>{ S.order=shuffle(S.order); S.checked=false; refresh(); };
+}},
+{id:"dis", title:"Que dis-tu au conseil ?", dur:8, livret:"« Ton intervention »", lead:"Trois façons de réagir. Laquelle est celle d’un bon délégué ?", render(el){
+  const S=state.b.dis||(state.b.dis={deck:forLv(SCEN), i:0, picked:null});
+  if(S.i>=S.deck.length){ el.innerHTML=head(this)+`<p class="hand ink">Toutes les situations sont passées.</p><div class="card"><b>À retenir :</b> être respectueux, factuel et concis ; parler au nom de la classe ; rester discret sur la vie privée.</div><div class="spacer"></div><button class="btn ghost" id="rs">Rejouer</button>`; $("#rs",el).onclick=()=>{ delete state.b.dis; refresh(); }; return; }
+  const s=S.deck[S.i];
+  el.innerHTML=head(this)+`<p class="counter">Situation ${S.i+1} / ${S.deck.length}</p><div class="situ">${esc(s.c)}</div>
+    <div class="opts long">${s.o.map((o,k)=>{ let cls=""; if(S.picked!=null) cls=o.ok?"right":(S.picked===k?"wrong":""); return `<button class="opt ${cls}" data-o="${k}" ${S.picked!=null?"disabled":""}><span class="lt">${"ABC"[k]}</span><span>${esc(o.t)}${S.picked!=null?`<span class="opt-fb">${esc(o.f)}</span>`:""}</span></button>`; }).join("")}</div>
+    ${S.picked!=null?award(2)+`<div class="row end" style="margin-top:1rem"><button class="btn" id="nx">Situation suivante</button></div>`:""}`;
+  $$("[data-o]",el).forEach(b=>b.onclick=()=>{ S.picked=+b.dataset.o; refresh(); });
+  const nx=$("#nx",el); if(nx) nx.onclick=()=>{ S.i++; S.picked=null; refresh(); };
+}},
+{id:"notes", title:"Défi prise de notes", dur:6, livret:"« Prise de notes en conseil de classe »", lead:"Comme au vrai conseil : écoute l’appréciation, puis coche la bonne case dans chaque colonne de ta grille.", render(el){
+  const S=state.b.not||(state.b.not={deck:forLv(APPR), i:0, sel:{}, show:false, cd:0, checked:false});
+  if(S.i>=S.deck.length){ el.innerHTML=head(this)+`<p class="hand ink">Défi terminé ! Pense à utiliser la grille de ton livret au prochain conseil.</p><button class="btn ghost" id="rs">Rejouer</button>`; $("#rs",el).onclick=()=>{ delete state.b.not; refresh(); }; return; }
+  const ap=S.deck[S.i];
+  const nOk=NCOLS.filter(c=>S.sel[c.k]===ap.a[c.k]).length;
+  el.innerHTML=head(this)+`<p class="counter">Élève ${S.i+1} / ${S.deck.length} : ${esc(ap.n)}</p>
+    <div class="appr">${S.show||S.checked?`<div class="txt">${esc(ap.t)}</div>`:`<div class="veil">L’appréciation est cachée. Lis-la à voix haute ou affiche-la quelques secondes.</div>`}${S.cd>0?`<span class="cd">${S.cd}</span>`:""}</div>
+    <div class="row" style="margin-bottom:1rem"><button class="btn ghost" id="sh">Afficher ${state.level==="65"?20:12} secondes</button><button class="btn ghost" id="tg">${S.show?"Cacher":"Afficher"} le texte</button></div>
+    <div class="ngrid">${NCOLS.map(c=>`<div class="colx"><h4>${c.n}</h4>${c.o.map(o=>{ let cls=""; if(S.checked){ if(o===ap.a[c.k]) cls="right"; else if(S.sel[c.k]===o) cls="wrong"; } else if(S.sel[c.k]===o) cls="sel"; return `<button class="nb ${cls}" data-c="${c.k}" data-v="${esc(o)}" ${S.checked?"disabled":""}>${esc(o)}</button>`; }).join("")}</div>`).join("")}</div>
+    ${S.checked?`<p class="hand ${nOk===5?"":"mid"}">${nOk} / 5 bonnes cases</p>${award(nOk)}<div class="row end"><button class="btn" id="nx">Élève suivant</button></div>`:`<div class="row end" style="margin-top:1rem"><button class="btn" id="ck">Corriger</button></div>`}`;
+  $("#sh",el).onclick=()=>{ clearInterval(S.h); S.show=true; S.cd=state.level==="65"?20:12; refresh(); S.h=setInterval(()=>{ S.cd--; if(S.cd<=0){ clearInterval(S.h); S.cd=0; S.show=false; } if(BLOCKS[state.step].id==="notes") refresh(); else clearInterval(S.h); },1000); };
+  $("#tg",el).onclick=()=>{ clearInterval(S.h); S.cd=0; S.show=!S.show; refresh(); };
+  $$("[data-c]",el).forEach(b=>b.onclick=()=>{ S.sel[b.dataset.c]=b.dataset.v; refresh(); });
+  const ck=$("#ck",el); if(ck) ck.onclick=()=>{ clearInterval(S.h); S.cd=0; S.checked=true; refresh(); };
+  const nx=$("#nx",el); if(nx) nx.onclick=()=>{ S.i++; S.sel={}; S.show=false; S.checked=false; refresh(); };
+}},
+{id:"qual", title:"Les qualités du délégué", dur:4, lead:"Lis l’indice. Les équipes proposent une lettre chacune leur tour. Six erreurs maximum !", render(el){
+  const S=state.b.qua||(state.b.qua={deck:forLv(QUAL), i:0, g:[], reveal:false});
+  if(S.i>=S.deck.length){ el.innerHTML=head(this)+`<p class="hand ink">À l’écoute, respectueux, discret, responsable, dynamique, juste${state.level==="43"?", objectif, diplomate":""} : c’est toi !</p><button class="btn ghost" id="rs">Rejouer</button>`; $("#rs",el).onclick=()=>{ delete state.b.qua; refresh(); }; return; }
+  const q=S.deck[S.i], fixedLen=q.fixed?q.fixed.length:0;
+  const letters=[...q.w].map((ch,k)=>({ch, k, isL:/[A-ZÀ-Ü]/i.test(ch)&&k>=fixedLen}));
+  const needed=[...new Set(letters.filter(l=>l.isL).map(l=>norm(l.ch)))];
+  const errors=S.g.filter(x=>!needed.includes(x)).length;
+  const won=needed.every(x=>S.g.includes(x)), lost=errors>=6&&!won, end=won||lost||S.reveal;
+  el.innerHTML=head(this)+`<p class="counter">Mot ${S.i+1} / ${S.deck.length}</p><div class="situ" style="text-align:center">${esc(q.h)}</div>
+    <div class="word">${letters.map(l=>{ if(l.ch===" ") return `<span class="sp"></span>`; if(!l.isL) return `<span class="fixed">${esc(l.ch)}</span>`; const ok=S.g.includes(norm(l.ch)); return `<span class="${!ok&&end?"miss":""}">${ok||end?esc(l.ch):""}</span>`; }).join("")}</div>
+    <div class="pencils">${Array.from({length:6},(_,k)=>`<span class="${k<errors?"used":""}">✏️</span>`).join("")}</div>
+    <div class="spacer"></div>
+    ${end?`<p class="hand ${won?"":"bad"}" style="text-align:center">${won?"Trouvé !":"Le mot était : "+esc(q.w)}</p>${won?award(2):""}<div class="row center" style="margin-top:1rem"><button class="btn" id="nx">Mot suivant</button></div>`
+      :`<div class="keys">${"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map(c=>`<button data-k="${c}" class="${S.g.includes(c)?(needed.includes(c)?"hit":"no"):""}" ${S.g.includes(c)?"disabled":""}>${c}</button>`).join("")}</div><div class="row center" style="margin-top:1rem"><button class="btn ghost" id="rv">Révéler le mot</button></div>`}`;
+  $$("[data-k]",el).forEach(b=>b.onclick=()=>{ S.g.push(b.dataset.k); refresh(); });
+  const rv=$("#rv",el); if(rv) rv.onclick=()=>{ S.reveal=true; refresh(); };
+  const nx=$("#nx",el); if(nx) nx.onclick=()=>{ S.i++; S.g=[]; S.reveal=false; refresh(); };
+}},
+{id:"quiz", title:"Quiz éclair", dur:5, lead:"20 secondes par question. Chaque équipe lève 1, 2, 3 ou 4 doigts pour répondre.", render(el){
+  const S=state.b.quiz||(state.b.quiz={deck:forLv(QUIZ), i:0, picked:null, started:false});
+  if(S.i>=S.deck.length){ el.innerHTML=head(this)+`<p class="hand ink">Quiz terminé ! Direction le podium.</p>`; return; }
+  const q=S.deck[S.i];
+  if(!S.started){ el.innerHTML=head(this)+`<p class="big-text">${S.deck.length} questions pour vérifier ce que vous avez retenu.</p><div class="spacer"></div><button class="btn big" id="go">Lancer la question 1</button>`; $("#go",el).onclick=()=>{ S.started=true; setTimer(20,true); refresh(); }; return; }
+  el.innerHTML=head(this)+`<p class="counter">Question ${S.i+1} / ${S.deck.length}</p><div class="situ">${esc(q.q)}</div>
+    <div class="opts">${q.o.map((o,k)=>{ let cls=""; if(S.picked!=null) cls=k===q.a?"right":(S.picked===k?"wrong":""); return `<button class="opt ${cls}" data-q="${k}" ${S.picked!=null?"disabled":""}><span class="lt">${k+1}</span>${esc(o)}</button>`; }).join("")}</div>
+    ${S.picked!=null?`<div class="fb"><span class="hand">${esc(q.o[q.a])}</span><p>${esc(q.w)}</p></div>${award(1,"Bonne réponse :")}<div class="row end" style="margin-top:1rem"><button class="btn" id="nx">${S.i<S.deck.length-1?"Question suivante":"Terminer"}</button></div>`:`<div class="row end" style="margin-top:1rem"><button class="btn ghost" id="rv">Afficher la réponse</button></div>`}`;
+  $$("[data-q]",el).forEach(b=>b.onclick=()=>{ S.picked=+b.dataset.q; pauseTimer(); refresh(); });
+  const rv=$("#rv",el); if(rv) rv.onclick=()=>{ S.picked=-1; pauseTimer(); refresh(); };
+  const nx=$("#nx",el); if(nx) nx.onclick=()=>{ S.i++; S.picked=null; if(S.i<S.deck.length) setTimer(20,true); refresh(); };
+}},
+{id:"bilan", title:"Bilan et diplôme", dur:5, lead:"Bravo à toutes les équipes ! Un dernier mot sur la formation, puis le diplôme.", render(el){
+  const S=state.b.bil||(state.b.bil={met:[0,0,0,0,0]});
+  const ranked=state.teams.map((t,i)=>({...t,i})).sort((a,b)=>b.score-a.score);
+  const order=[ranked[1],ranked[0],ranked[2],ranked[3]].filter(Boolean);
+  const top=Math.max(1,ranked[0].score);
+  el.innerHTML=head(this)+`<div class="podium">${order.map(t=>{ const rk=ranked.indexOf(t)+1; return `<div class="pod c-${t.color}" style="height:${(30+70*t.score/top).toFixed(0)}%"><span class="rk">${rk}</span>${esc(t.name)}<span class="sc">${t.score} pts</span></div>`; }).join("")}</div>
+    <h2>Quelle météo pour cette formation ?</h2><p class="counter">Comptez les mains levées et cliquez pour ajouter.</p>
+    <div class="meteo">${METEO.map((m,k)=>`<button data-m="${k}"><span class="e">${m.e}</span>${m.n}<span class="c">${S.met[k]}</span></button>`).join("")}</div>
+    <p class="quote">« Être délégué, c’est apprendre à représenter, écouter et s’exprimer avec responsabilité. Vous êtes les acteurs de la vie du collège. »</p>
+    <div id="diploma"><div class="h">Collège Yves du Manoir, 2025-2026</div><h2>Diplôme de délégué(e) formé(e)</h2><p>Ce diplôme est décerné à</p><div class="line"></div><p>délégué(e) de la classe de ………… pour avoir suivi la formation des délégués et s’être engagé(e) à représenter sa classe avec écoute, respect et discrétion.</p><div class="sig"><span>M. Deston, conseiller principal d’éducation</span><span>Le / la délégué(e)</span></div><p style="font-size:.7rem; margin:1.2rem 0 0; opacity:.6">© 2026 Eude Florian</p></div>
+    <div class="row center" style="margin-top:1rem"><button class="btn" id="pr">Imprimer le diplôme</button></div>`;
+  $$("[data-m]",el).forEach(b=>b.onclick=()=>{ S.met[+b.dataset.m]++; refresh(); });
+  $("#pr",el).onclick=()=>window.print();
+}}
+];
+
+/* ============ DÉMARRAGE ============ */
+const saved=load();
+renderScores();
+if(saved&&saved.level&&saved.step>=0&&saved.step<BLOCKS.length) go(saved.step); else go(-1);
+</script>
+</body>
+</html>
