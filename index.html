@@ -189,6 +189,10 @@ details.rules-box ul{margin:.5rem 0 0}
 .opts.long .opt{font-size:1.25rem}
 .opt-fb{display:block; font-family:var(--f-hand); font-size:1.45rem; margin-top:.25rem; text-decoration:none}
 
+.opt.sel{border-color:var(--ink); box-shadow:inset 0 0 0 2px var(--ink); background:var(--paper); font-weight:700}
+.opt.missed{border:2px dashed var(--ok); color:var(--ok)}
+.nb.missed{border:2px dashed var(--ok); color:var(--ok); background:var(--card)}
+.legend .l4::before{background:transparent; border:2px dashed var(--ok)}
 /* Instance */
 .clues{list-style:none; padding:0; margin:0 0 1rem; display:grid; gap:.5rem}
 .clues li{display:flex; gap:.8rem; align-items:center; background:var(--card); border:2px solid var(--edge); border-radius:12px; padding:.7rem 1rem; font-size:1.35rem}
@@ -287,7 +291,7 @@ details.rules-box ul{margin:.5rem 0 0}
 </head>
 <body>
 <header id="top">
-  <div class="brand">Formation des délégués<small>Collège Yves du Manoir, 2025-2026, M. Deston (CPE)</small></div>
+  <div class="brand">Formation des délégués<small>Collège Yves du Manoir, 2026-2027, M. Deston (CPE)</small></div>
   <span class="lvl" id="lvlTag"></span>
   <div id="scores"></div>
 </header>
@@ -573,7 +577,7 @@ document.addEventListener("keydown",e=>{
 function renderHome(el){
   el.innerHTML=`<div class="home">
     <h1>Formation des délégués de classe</h1>
-    <p class="sub">Collège Yves du Manoir, année 2025-2026</p>
+    <p class="sub">Collège Yves du Manoir, année 2026-2027</p>
     <p class="howto" style="margin:-1.2rem 0 2rem; font-size:1.1rem">Formation animée par M. Deston, conseiller principal d’éducation.</p>
     <h2>Quel groupe aujourd’hui ?</h2>
     <div class="lvl-pick">
@@ -674,15 +678,25 @@ const BLOCKS = [
   <div class="card" style="margin-top:2rem"><span class="hand ink">La délégation, c’est un contrat de confiance entre la classe et ses délégués.</span><p style="margin:.4rem 0 0">Pour être crédible auprès des adultes, il faut prendre l’avis de ses camarades : c’est la consultation.</p></div>`;
   $$("[data-cap]",el).forEach(b=>b.onclick=()=>{ const i=+b.dataset.cap; S.open=S.open.includes(i)?S.open.filter(x=>x!==i):[...S.open,i]; refresh(); });
 }},
-{id:"qui", title:"Vers qui je l’envoie ?", dur:6, livret:"« Vers qui me tourner si j’ai une question ? »", lead:"Un camarade vient te voir avec un problème. À quel adulte du collège l’adresser ?", render(el){
-  const S=state.b.qui||(state.b.qui={deck:shuffle(forLv(SITU)), i:0, picked:null});
-  if(S.i>=S.deck.length){ el.innerHTML=head(this)+`<p class="hand ink">Toutes les situations sont passées. Bravo !</p><button class="btn ghost" id="rs">Rejouer</button>`; $("#rs",el).onclick=()=>{ delete state.b.qui; refresh(); }; return; }
+{id:"qui", title:"Vers qui je l’envoie ?", dur:6, livret:"« Vers qui me tourner si j’ai une question ? »", lead:"Un camarade vient te voir avec un problème. À quel(s) adulte(s) du collège l’adresser ? Il peut y avoir plusieurs bonnes réponses.", render(el){
+  const S=state.b.qui||(state.b.qui={deck:shuffle(forLv(SITU)), i:0, sel:[], checked:false});
+  if(S.i>=S.deck.length){ el.innerHTML=head(this)+`<p class="hand ink">Toutes les situations sont passées. Bravo !</p><div class="row"><button class="btn ghost" id="pv">◀ Situation précédente</button><button class="btn ghost" id="rs">Rejouer</button></div>`; $("#rs",el).onclick=()=>{ delete state.b.qui; refresh(); }; $("#pv",el).onclick=()=>{ S.i--; S.sel=[]; S.checked=false; refresh(); }; return; }
   const s=S.deck[S.i];
-  el.innerHTML=head(this)+`<p class="counter">Situation ${S.i+1} / ${S.deck.length}</p><div class="situ">${esc(s.t)}</div>
-    <div class="opts">${PEOPLE.map(p=>{ let cls=""; if(S.picked){ if(s.ok.includes(p.id)) cls="right"; else if(S.picked===p.id) cls="wrong"; } return `<button class="opt ${cls}" data-p="${p.id}" ${S.picked?"disabled":""}><span class="em">${p.em}</span>${p.n}</button>`; }).join("")}</div>
-    ${S.picked?`<div class="fb ${s.ok.includes(S.picked)?"":"bad"}"><span class="hand ${s.ok.includes(S.picked)?"":"bad"}">${s.ok.includes(S.picked)?"Exactement !":"Pas le meilleur choix."}</span><p>${s.why}</p></div>${award(1)}<div class="row end" style="margin-top:1rem"><button class="btn" id="nx">Situation suivante</button></div>`:""}`;
-  $$("[data-p]",el).forEach(b=>b.onclick=()=>{ S.picked=b.dataset.p; refresh(); });
-  const nx=$("#nx",el); if(nx) nx.onclick=()=>{ S.i++; S.picked=null; refresh(); };
+  const nGood=S.sel.filter(id=>s.ok.includes(id)).length, nBad=S.sel.length-nGood, nMiss=s.ok.length-nGood;
+  let verdict="";
+  if(S.checked){ if(nBad===0&&nMiss===0) verdict=`<span class="hand">Exactement !</span>`; else if(nGood>0) verdict=`<span class="hand mid">Presque ! ${nMiss?nMiss+" bonne"+(nMiss>1?"s":"")+" réponse"+(nMiss>1?"s":"")+" oubliée"+(nMiss>1?"s":""):""}${nMiss&&nBad?", ":""}${nBad?nBad+" erreur"+(nBad>1?"s":""):""}.</span>`; else verdict=`<span class="hand bad">Pas le meilleur choix.</span>`; }
+  el.innerHTML=head(this)+`<p class="counter">Situation ${S.i+1} / ${S.deck.length}. Clique sur une ou plusieurs réponses, puis valide.</p><div class="situ">${esc(s.t)}</div>
+    <div class="opts">${PEOPLE.map(p=>{ const isS=S.sel.includes(p.id), isA=s.ok.includes(p.id); let cls=""; if(S.checked) cls=isA&&isS?"right":isA?"missed":isS?"wrong":""; else if(isS) cls="sel"; return `<button class="opt ${cls}" data-p="${p.id}" ${S.checked?"disabled":""}><span class="em">${p.em}</span>${S.checked&&isA&&isS?"✓ ":""}${p.n}${S.checked&&isA&&!isS?" (oubliée)":""}</button>`; }).join("")}</div>
+    ${S.checked?`<div class="legend"><span class="l1">Bonne réponse choisie</span><span class="l4">Bonne réponse oubliée</span><span class="l3">Erreur</span></div><div class="fb ${nBad===0&&nMiss===0?"":nGood?"mid":"bad"}">${verdict}<p>${s.why}</p></div>${award(1)}`:""}
+    <div class="row" style="margin-top:1rem; justify-content:space-between">
+      <button class="btn ghost" id="pv" ${S.i===0?"disabled":""}>◀ Situation précédente</button>
+      <div class="row">${S.checked?`<button class="btn ghost" id="redo">Recommencer cette situation</button><button class="btn" id="nx">Situation suivante</button>`:`<button class="btn" id="ok" ${S.sel.length?"":"disabled"}>Valider</button>`}</div>
+    </div>`;
+  $$("[data-p]",el).forEach(b=>b.onclick=()=>{ const id=b.dataset.p; S.sel=S.sel.includes(id)?S.sel.filter(x=>x!==id):[...S.sel,id]; refresh(); });
+  const ok=$("#ok",el); if(ok) ok.onclick=()=>{ S.checked=true; refresh(); };
+  const redo=$("#redo",el); if(redo) redo.onclick=()=>{ S.sel=[]; S.checked=false; refresh(); };
+  $("#pv",el).onclick=()=>{ S.i--; S.sel=[]; S.checked=false; refresh(); };
+  const nx=$("#nx",el); if(nx) nx.onclick=()=>{ S.i++; S.sel=[]; S.checked=false; refresh(); };
 }},
 {id:"inst", title:"Devine l’instance", dur:7, livret:"« Plusieurs instances dans un collège… »", lead:"Les indices arrivent un par un. Moins tu en utilises, plus tu marques de points.", render(el){
   const S=state.b.inst||(state.b.inst={deck:shuffle(forLv(INST)), i:0, clues:1, wrong:[], found:false});
@@ -756,8 +770,8 @@ const BLOCKS = [
   el.innerHTML=head(this)+`<p class="counter">Élève ${S.i+1} / ${S.deck.length} : ${esc(ap.n)}</p>
     <div class="appr">${S.show||S.checked?`<div class="txt">${esc(ap.t)}</div>`:`<div class="veil">L’appréciation est cachée. Lis-la à voix haute ou affiche-la quelques secondes.</div>`}${S.cd>0?`<span class="cd">${S.cd}</span>`:""}</div>
     <div class="row" style="margin-bottom:1rem"><button class="btn ghost" id="sh">Afficher ${state.level==="65"?20:12} secondes</button><button class="btn ghost" id="tg">${S.show?"Cacher":"Afficher"} le texte</button></div>
-    <div class="ngrid">${NCOLS.map(c=>`<div class="colx"><h4>${c.n}</h4>${c.o.map(o=>{ let cls=""; if(S.checked){ if(o===ap.a[c.k]) cls="right"; else if(S.sel[c.k]===o) cls="wrong"; } else if(S.sel[c.k]===o) cls="sel"; return `<button class="nb ${cls}" data-c="${c.k}" data-v="${esc(o)}" ${S.checked?"disabled":""}>${esc(o)}</button>`; }).join("")}</div>`).join("")}</div>
-    ${S.checked?`<p class="hand ${nOk===5?"":"mid"}">${nOk} / 5 bonnes cases</p>${award(nOk)}<div class="row end"><button class="btn" id="nx">Élève suivant</button></div>`:`<div class="row end" style="margin-top:1rem"><button class="btn" id="ck">Corriger</button></div>`}`;
+    <div class="ngrid">${NCOLS.map(c=>`<div class="colx"><h4>${c.n}</h4>${c.o.map(o=>{ let cls=""; const isA=o===ap.a[c.k], isS=S.sel[c.k]===o; if(S.checked) cls=isA&&isS?"right":isA?"missed":isS?"wrong":""; else if(isS) cls="sel"; return `<button class="nb ${cls}" data-c="${c.k}" data-v="${esc(o)}" ${S.checked?"disabled":""}>${S.checked&&isA&&isS?"✓ ":""}${esc(o)}</button>`; }).join("")}</div>`).join("")}</div>
+    ${S.checked?`<div class="legend" style="margin-top:1rem"><span class="l1">Bonne case cochée</span><span class="l4">Bonne réponse non cochée</span><span class="l3">Case cochée par erreur</span></div><p class="hand ${nOk===5?"":"mid"}">${nOk} / 5 bonnes cases cochées</p>${award(nOk)}<div class="row end"><button class="btn" id="nx">Élève suivant</button></div>`:`<div class="row end" style="margin-top:1rem"><button class="btn" id="ck">Corriger</button></div>`}`;
   $("#sh",el).onclick=()=>{ clearInterval(S.h); S.show=true; S.cd=state.level==="65"?20:12; refresh(); S.h=setInterval(()=>{ S.cd--; if(S.cd<=0){ clearInterval(S.h); S.cd=0; S.show=false; } if(BLOCKS[state.step].id==="notes") refresh(); else clearInterval(S.h); },1000); };
   $("#tg",el).onclick=()=>{ clearInterval(S.h); S.cd=0; S.show=!S.show; refresh(); };
   $$("[data-c]",el).forEach(b=>b.onclick=()=>{ S.sel[b.dataset.c]=b.dataset.v; refresh(); });
@@ -803,7 +817,7 @@ const BLOCKS = [
     <h2>Quelle météo pour cette formation ?</h2><p class="counter">Comptez les mains levées et cliquez pour ajouter.</p>
     <div class="meteo">${METEO.map((m,k)=>`<button data-m="${k}"><span class="e">${m.e}</span>${m.n}<span class="c">${S.met[k]}</span></button>`).join("")}</div>
     <p class="quote">« Être délégué, c’est apprendre à représenter, écouter et s’exprimer avec responsabilité. Vous êtes les acteurs de la vie du collège. »</p>
-    <div id="diploma"><div class="h">Collège Yves du Manoir, 2025-2026</div><h2>Diplôme de délégué(e) formé(e)</h2><p>Ce diplôme est décerné à</p><div class="line"></div><p>délégué(e) de la classe de ………… pour avoir suivi la formation des délégués et s’être engagé(e) à représenter sa classe avec écoute, respect et discrétion.</p><div class="sig"><span>M. Deston, conseiller principal d’éducation</span><span>Le / la délégué(e)</span></div><p style="font-size:.7rem; margin:1.2rem 0 0; opacity:.6">© 2026 Eude Florian</p></div>
+    <div id="diploma"><div class="h">Collège Yves du Manoir, 2026-2027</div><h2>Diplôme de délégué(e) formé(e)</h2><p>Ce diplôme est décerné à</p><div class="line"></div><p>délégué(e) de la classe de ………… pour avoir suivi la formation des délégués et s’être engagé(e) à représenter sa classe avec écoute, respect et discrétion.</p><div class="sig"><span>M. Deston, conseiller principal d’éducation</span><span>Le / la délégué(e)</span></div><p style="font-size:.7rem; margin:1.2rem 0 0; opacity:.6">© 2026 Eude Florian</p></div>
     <div class="row center" style="margin-top:1rem"><button class="btn" id="pr">Imprimer le diplôme</button></div>`;
   $$("[data-m]",el).forEach(b=>b.onclick=()=>{ S.met[+b.dataset.m]++; refresh(); });
   $("#pr",el).onclick=()=>window.print();
